@@ -22,5 +22,5 @@ public class Comment {
     @ManyToOne
     private Review review;
 
-    private LocalDate createdDate;
+    private LocalDate createdAt;
 }

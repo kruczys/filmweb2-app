@@ -25,5 +25,5 @@ public class Review {
     @OneToMany(mappedBy = "review")
     private Set<Comment> comments;
 
-    private LocalDate createdDate;
+    private LocalDate createdAt;
 }
