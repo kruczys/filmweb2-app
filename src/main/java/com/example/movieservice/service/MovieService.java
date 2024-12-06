@@ -7,26 +7,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 public class MovieService {
     private final MovieRepository movieRepository;
     private final GenreRepository genreRepository;
-    private final DirectorRepository directorRepository;
-    private final ActorRepository actorRepository;
+    private final CastMemberRepository castMemberRepository;
     private final ReviewRepository reviewRepository;
 
     public MovieService(MovieRepository movieRepository,
                         GenreRepository genreRepository,
-                        DirectorRepository directorRepository,
-                        ActorRepository actorRepository,
+                        CastMemberRepository castMemberRepository,
                         ReviewRepository reviewRepository) {
         this.movieRepository = movieRepository;
         this.genreRepository = genreRepository;
-        this.directorRepository = directorRepository;
-        this.actorRepository = actorRepository;
+        this.castMemberRepository = castMemberRepository;
         this.reviewRepository = reviewRepository;
     }
 
@@ -43,19 +39,17 @@ public class MovieService {
                 .orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
     }
 
-    public Page<Movie> searchMovies(String title, String genre, String director, Pageable pageable) {
+    public Page<Movie> searchMovies(String title, String genre, String castMember, Pageable pageable) {
         if (title != null && !title.isEmpty()) {
             return movieRepository.findByTitleContainingIgnoreCase(title, pageable);
         }
         return movieRepository.findAll(pageable);
     }
 
-    @Transactional
     public Movie addMovie(Movie movie) {
         return movieRepository.save(movie);
     }
 
-    @Transactional
     public Movie updateMovie(Long id, Movie movieDetails) {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
@@ -65,14 +59,12 @@ public class MovieService {
         if (movieDetails.getReleaseDate() != null) movie.setReleaseDate(movieDetails.getReleaseDate());
         if (movieDetails.getImageUrl() != null) movie.setImageUrl(movieDetails.getImageUrl());
         if (movieDetails.getTrailerUrl() != null) movie.setTrailerUrl(movieDetails.getTrailerUrl());
-        if (movieDetails.getDirector() != null) movie.setDirector(movieDetails.getDirector());
+        if (movieDetails.getCast() != null) movie.setCast(movieDetails.getCast());
         if (movieDetails.getGenres() != null) movie.setGenres(movieDetails.getGenres());
-        if (movieDetails.getActors() != null) movie.setActors(movieDetails.getActors());
 
         return movieRepository.save(movie);
     }
 
-    @Transactional
     public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
     }

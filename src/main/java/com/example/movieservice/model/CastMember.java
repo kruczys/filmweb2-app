@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Data
 @Entity
-public class Actor {
+public class CastMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -32,7 +32,6 @@ public class ReviewService {
         return reviewRepository.findByUserId(userId, pageable);
     }
 
-    @Transactional
     public Review addReview(Long userId, Long movieId, Review review) {
         User user = userService.getUserById(userId);
         Movie movie = movieService.getMovieById(movieId);
@@ -43,7 +42,6 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    @Transactional
     public Review updateReview(Long reviewId, Review reviewDetails) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
@@ -54,7 +52,6 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    @Transactional
     public void deleteReview(Long reviewId) {
         reviewRepository.deleteById(reviewId);
     }

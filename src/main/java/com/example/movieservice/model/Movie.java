@@ -23,11 +23,8 @@ public class Movie {
     @ManyToMany
     private Set<Genre> genres;
 
-    @ManyToOne
-    private Director director;
-
     @ManyToMany
-    private Set<Actor> actors;
+    private Set<CastMember> cast;
 
     private String imageUrl;
 

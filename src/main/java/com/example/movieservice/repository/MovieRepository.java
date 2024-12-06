@@ -18,6 +18,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m JOIN m.genres g WHERE g.name = :genreName")
     List<Movie> findByGenreName(@Param("genreName") String genreName);
 
-    List<Movie> findByDirectorFirstNameContainingIgnoreCaseOrDirectorLastNameContainingIgnoreCase(
-            String directorFirstName, String directorLastName);
+    List<Movie> findByCastMemberFirstNameContainingIgnoreCaseOrCastMemberLastNameContainingIgnoreCase(
+            String castMemberFirstName, String castMemberLastName);
 }

@@ -28,7 +28,6 @@ public class CommentService {
         return commentRepository.findByReviewId(reviewId, pageable);
     }
 
-    @Transactional
     public Comment addComment(Long userId, Long reviewId, Comment comment) {
         User user = userService.getUserById(userId);
         comment.setUser(user);
@@ -36,7 +35,6 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    @Transactional
     public Comment updateComment(Long commentId, Comment commentDetails) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
@@ -48,7 +46,6 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    @Transactional
     public void deleteComment(Long commentId) {
         commentRepository.deleteById(commentId);
     }
