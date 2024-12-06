@@ -16,6 +16,8 @@ public class Review {
 
     private int rating;
 
+    private String content;
+
     @ManyToOne
     private User user;
 
