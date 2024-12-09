@@ -1,6 +1,8 @@
 package com.example.movieservice.controller;
 
+import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
+import com.example.movieservice.service.MovieService;
 import com.example.movieservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
+    private final MovieService movieService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, MovieService movieService) {
         this.userService = userService;
+        this.movieService = movieService;
     }
 
     @PostMapping("/register")
@@ -32,25 +36,29 @@ public class UserController {
 
     @PostMapping("/{userId}/favorites/{movieId}")
     public ResponseEntity<?> addToFavorites(@PathVariable Long userId, @PathVariable Long movieId) {
-        userService.addToFavorites(userId, movieId);
+        Movie movie = movieService.getMovieById(movieId);
+        userService.addToFavorites(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/favorites/{movieId}")
     public ResponseEntity<?> removeFromFavorites(@PathVariable Long userId, @PathVariable Long movieId) {
-        userService.removeFromFavorites(userId, movieId);
+        Movie movie = movieService.getMovieById(movieId);
+        userService.removeFromFavorites(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{userId}/watchlist/{movieId}")
     public ResponseEntity<?> addToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
-        userService.addToWatchlist(userId, movieId);
+        Movie movie = movieService.getMovieById(movieId);
+        userService.addToWatchlist(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/watchlist/{movieId}")
     public ResponseEntity<?> removeFromWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
-        userService.removeFromWatchlist(userId, movieId);
+        Movie movie = movieService.getMovieById(movieId);
+        userService.removeFromWatchlist(userId, movie);
         return ResponseEntity.ok().build();
     }
 }
