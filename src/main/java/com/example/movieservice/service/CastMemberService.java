@@ -3,8 +3,10 @@ package com.example.movieservice.service;
 import com.example.movieservice.model.CastMember;
 import com.example.movieservice.repository.CastMemberRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -43,5 +45,9 @@ public class CastMemberService {
 
     public void deleteCastMember(Long id) {
         castMemberRepository.deleteById(id);
+    }
+
+    public Page<CastMember> getAllCastMembers(Pageable pageable) {
+        return castMemberRepository.findAll(pageable);
     }
 }

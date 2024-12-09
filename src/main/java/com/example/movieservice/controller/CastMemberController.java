@@ -2,6 +2,9 @@ package com.example.movieservice.controller;
 
 import com.example.movieservice.model.CastMember;
 import com.example.movieservice.service.CastMemberService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -17,8 +20,13 @@ public class CastMemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CastMember>> getAllCastMembers() {
-        return ResponseEntity.ok(castMemberService.getAllCastMembers());
+    public ResponseEntity<Page<CastMember>> getAllCastMembers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
+        return ResponseEntity.ok(castMemberService.getAllCastMembers(pageRequest));
     }
 
     @GetMapping("/{id}")
