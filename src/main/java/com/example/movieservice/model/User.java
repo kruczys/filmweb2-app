@@ -38,4 +38,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private Set<Review> reviews;
+
+    @ManyToMany
+    private Set<Movie> ignoredMovies;
 }

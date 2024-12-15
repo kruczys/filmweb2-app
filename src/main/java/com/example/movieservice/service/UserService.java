@@ -90,6 +90,20 @@ public class UserService {
     }
 
     @Transactional
+    public void addToIgnored(Long userId, Movie movie) {
+        User user = getUserById(userId);
+        user.getIgnoredMovies().add(movie);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void removeFromIgnored(Long userId, Movie movie) {
+        User user = getUserById(userId);
+        user.getIgnoredMovies().remove(movie);
+        userRepository.save(user);
+    }
+
+    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }

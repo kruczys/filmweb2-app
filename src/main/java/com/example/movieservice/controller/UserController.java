@@ -61,4 +61,18 @@ public class UserController {
         userService.removeFromWatchlist(userId, movie);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{userId}/ignored/{movieId}")
+    public ResponseEntity<?> addToIgnored(@PathVariable Long userId, @PathVariable Long movieId) {
+        Movie movie = movieService.getMovieById(movieId);
+        userService.addToIgnored(userId, movie);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}/ignored/{movieId}")
+    public ResponseEntity<?> removeFromIgnored(@PathVariable Long userId, @PathVariable Long movieId) {
+        Movie movie = movieService.getMovieById(movieId);
+        userService.removeFromIgnored(userId, movie);
+        return ResponseEntity.ok().build();
+    }
 }
