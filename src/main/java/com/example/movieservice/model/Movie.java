@@ -21,10 +21,15 @@ public class Movie {
     private LocalDate releaseDate;
 
     @ManyToMany
-    private Set<Genre> genres;
+    @JoinTable(
+            name = "movie_cast",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "cast_member_id")
+    )
+    private Set<CastMember> cast;
 
     @ManyToMany
-    private Set<CastMember> cast;
+    private Set<Genre> genres;
 
     private String imageUrl;
 
@@ -36,7 +41,7 @@ public class Movie {
     @ManyToMany(mappedBy = "favoriteMovies")
     private Set<User> favoritedBy;
 
-    @ManyToMany(mappedBy = "watchlist")
+    @ManyToMany(mappedBy = "watchList")
     private Set<User> inWatchlistOf;
 
     @ManyToMany(mappedBy = "ignoredMovies")

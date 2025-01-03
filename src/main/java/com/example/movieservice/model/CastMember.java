@@ -25,6 +25,6 @@ public class CastMember {
 
     private String imageUrl;
 
-    @ManyToMany(mappedBy = "actors")
+    @ManyToMany(mappedBy = "cast")
     private Set<Movie> movies;
 }
