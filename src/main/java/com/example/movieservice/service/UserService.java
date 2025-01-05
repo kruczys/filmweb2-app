@@ -1,24 +1,42 @@
 package com.example.movieservice.service;
 
-import com.example.movieservice.model.User;
 import com.example.movieservice.model.Movie;
+import com.example.movieservice.model.User;
 import com.example.movieservice.model.enums.Role;
 import com.example.movieservice.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
     }
 
     public User registerUser(User user) {
@@ -72,6 +90,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public Set<Movie> getFavoriteMovies(Long userId) {
+        User user = getUserById(userId);
+        return user.getFavoriteMovies();
+    }
+
+    public Set<Movie> getWatchlist(Long userId) {
+        User user = getUserById(userId);
+        return user.getWatchList();
+    }
+
     public List<User> getMostActiveUsers() {
         return userRepository.findMostActiveUsers();
     }
@@ -80,13 +108,32 @@ public class UserService {
     public User updateUser(Long id, User userDetails) {
         User user = getUserById(id);
 
-        if (userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
-        if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
+        if (userDetails.getUsername() != null) {
+            if (!user.getUsername().equals(userDetails.getUsername()) &&
+                    userRepository.existsByUsername(userDetails.getUsername())) {
+                throw new RuntimeException("Username already exists");
+            }
+            user.setUsername(userDetails.getUsername());
+        }
+
+        if (userDetails.getEmail() != null) {
+            if (!user.getEmail().equals(userDetails.getEmail()) &&
+                    userRepository.existsByEmail(userDetails.getEmail())) {
+                throw new RuntimeException("Email already exists");
+            }
+            user.setEmail(userDetails.getEmail());
+        }
+
         if (userDetails.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Transactional
@@ -103,8 +150,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public Set<Movie> getIgnoredMovies(Long userId) {
+        User user = getUserById(userId);
+        return user.getIgnoredMovies();
     }
 }
