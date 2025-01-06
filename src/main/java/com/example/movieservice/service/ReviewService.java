@@ -5,9 +5,12 @@ import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
 import com.example.movieservice.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -58,5 +61,9 @@ public class ReviewService {
 
     public Double getAverageMovieRating(Long movieId) {
         return reviewRepository.calculateAverageRatingForMovie(movieId);
+    }
+
+    public List<Review> getLatestReviews() {
+        return reviewRepository.findLatestReviews(PageRequest.of(0, 10));
     }
 }

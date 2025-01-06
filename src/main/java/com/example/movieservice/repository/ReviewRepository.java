@@ -1,6 +1,7 @@
 package com.example.movieservice.repository;
 
 import com.example.movieservice.model.Review;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.movie.id = :movieId")
     Double calculateAverageRatingForMovie(Long movieId);
+
+    @Query("SELECT r FROM Review r ORDER BY r.createdAt DESC")
+    List<Review> findLatestReviews(Pageable pageable);
 }

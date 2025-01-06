@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{fragments/layout :: head('Strona główna')}">
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+  <!-- Hero section -->
+  <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
+    <div class="col-md-6 px-0">
+      <h1 class="display-4">Witaj w MovieService</h1>
+      <p class="lead my-3">Odkryj nowe filmy, dziel się opiniami i twórz własne listy ulubionych tytułów.</p>
+      <p class="lead mb-0" sec:authorize="!isAuthenticated()">
+        <a href="/auth/register" class="btn btn-light fw-bold">Dołącz teraz</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Latest movies section -->
+  <h2 class="mb-4">Najnowsze filmy</h2>
+  <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
+    <div class="col" th:each="movie : ${latestMovies}">
+      <div class="card h-100">
+        <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
+          <p class="card-text text-muted" th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular movies section -->
+  <h2 class="mb-4">Popularne filmy</h2>
+  <div class="row row-cols-1 row-cols-md-5 g-4">
+    <div class="col" th:each="movie : ${popularMovies}">
+      <div class="card h-100">
+        <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
+          <p class="card-text">
+            <i class="bi bi-people-fill text-primary"></i>
+            <span th:text="${movie.reviews.size()}">0</span> recenzji
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+</body>
+</html>
