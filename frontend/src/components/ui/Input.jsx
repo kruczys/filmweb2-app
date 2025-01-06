@@ -1,23 +1,20 @@
 export const Input = ({
-                        type = 'text',
-                        label,
-                        name,
-                        value,
-                        onChange,
-                        error,
-                        required = false,
-                        placeholder,
-                        className = '',
-                      }) => {
+  type = 'text',
+  label,
+  name,
+  value,
+  onChange,
+  error,
+  required = false,
+  placeholder,
+  className = '',
+}) => {
   const inputId = `input-${name}`;
 
   return (
     <div className="space-y-1">
       {label && (
-        <label
-          htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
@@ -37,9 +34,7 @@ export const Input = ({
           ${className}
         `}
       />
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

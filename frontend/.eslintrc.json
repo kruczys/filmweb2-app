@@ -6,12 +6,7 @@
     "plugin:jsx-a11y/recommended",
     "prettier"
   ],
-  "plugins": [
-    "react",
-    "react-hooks",
-    "jsx-a11y",
-    "prettier"
-  ],
+  "plugins": ["react", "react-hooks", "jsx-a11y", "prettier"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
@@ -21,10 +16,7 @@
     "no-console": "warn",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "jsx-quotes": [
-      "error",
-      "prefer-double"
-    ]
+    "jsx-quotes": ["error", "prefer-double"]
   },
   "settings": {
     "react": {

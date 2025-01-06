@@ -1,12 +1,12 @@
 export const Button = ({
-                         children,
-                         variant = 'primary',
-                         size = 'medium',
-                         onClick,
-                         type = 'button',
-                         disabled = false,
-                         className = '',
-                       }) => {
+  children,
+  variant = 'primary',
+  size = 'medium',
+  onClick,
+  type = 'button',
+  disabled = false,
+  className = '',
+}) => {
   const baseStyles = 'font-semibold rounded focus:outline-none focus:ring-2 focus:ring-offset-2';
 
   const variants = {
