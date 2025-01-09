@@ -5,10 +5,11 @@ import com.example.movieservice.service.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/comments")
+@Controller
+@RequestMapping("/comments")
 @CrossOrigin(origins = "*")
 public class CommentController {
     private final CommentService commentService;

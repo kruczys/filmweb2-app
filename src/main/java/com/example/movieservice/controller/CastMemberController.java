@@ -6,11 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/cast-members")
+@Controller
+@RequestMapping("/cast-members")
 @CrossOrigin(origins = "*")
 public class CastMemberController {
     private final CastMemberService castMemberService;

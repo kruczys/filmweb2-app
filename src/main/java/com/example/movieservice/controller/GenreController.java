@@ -3,11 +3,12 @@ package com.example.movieservice.controller;
 import com.example.movieservice.model.Genre;
 import com.example.movieservice.service.GenreService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/genres")
+@Controller
+@RequestMapping("/genres")
 @CrossOrigin(origins = "*")
 public class GenreController {
     private final GenreService genreService;

@@ -5,10 +5,11 @@ import com.example.movieservice.model.User;
 import com.example.movieservice.service.MovieService;
 import com.example.movieservice.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
+@RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;

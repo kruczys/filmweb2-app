@@ -5,10 +5,11 @@ import com.example.movieservice.service.ReviewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/reviews")
+@Controller
+@RequestMapping("/reviews")
 @CrossOrigin(origins = "*")
 public class ReviewController {
     private final ReviewService reviewService;
