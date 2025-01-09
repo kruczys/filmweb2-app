@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Lista filmów')}">
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+  <!-- Filters and sorting -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <form class="d-flex" action="/movies/search" method="get">
+        <input class="form-control me-2" type="search"
+               placeholder="Szukaj filmów..." name="title">
+        <button class="btn btn-primary" type="submit">Szukaj</button>
+      </form>
+    </div>
+    <div class="col-md-4">
+      <select class="form-select" onchange="updateSort(this.value)">
+        <option th:selected="${sortBy == 'releaseDate'}" value="releaseDate">Najnowsze</option>
+        <option th:selected="${sortBy == 'title'}" value="title">Tytuł A-Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Movies grid -->
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    <div class="col" th:each="movie : ${movies}">
+      <div class="card h-100">
+        <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
+          <p class="card-text text-muted"
+             th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+          <p class="card-text"
+             th:text="${#strings.length(movie.description) > 100 ?
+                                    #strings.substring(movie.description,0,100) + '...' :
+                                    movie.description}">
+          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            <a th:href="@{/movies/{id}(id=${movie.id})}"
+               class="btn btn-primary">Szczegóły</a>
+            <small class="text-muted">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span th:text="${movie.averageRating > 0 ?
+               #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
+               'Brak ocen'}">
+              </span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <nav th:if="${movies.totalPages > 1}" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${movies.first ? 'disabled' : ''}">
+        <a class="page-link"
+           th:href="@{/movies(page=${movies.number - 1}, size=${movies.size}, sortBy=${sortBy})}">
+          Poprzednia
+        </a>
+      </li>
+
+      <li class="page-item"
+          th:each="pageNum : ${#numbers.sequence(0, movies.totalPages - 1)}"
+          th:classappend="${pageNum == movies.number ? 'active' : ''}">
+        <a class="page-link"
+           th:href="@{/movies(page=${pageNum}, size=${movies.size}, sortBy=${sortBy})}"
+           th:text="${pageNum + 1}">1</a>
+      </li>
+
+      <li class="page-item"
+          th:classappend="${movies.last ? 'disabled' : ''}">
+        <a class="page-link"
+           th:href="@{/movies(page=${movies.number + 1}, size=${movies.size}, sortBy=${sortBy})}">
+          Następna
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+
+<script>
+  function updateSort(value) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('sortBy', value);
+    window.location.href = currentUrl.toString();
+  }
+</script>
+</body>
+</html>

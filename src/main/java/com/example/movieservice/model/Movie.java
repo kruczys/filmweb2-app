@@ -46,4 +46,14 @@ public class Movie {
 
     @ManyToMany(mappedBy = "ignoredMovies")
     private Set<User> ignoredBy;
+
+    public double getAverageRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
 }

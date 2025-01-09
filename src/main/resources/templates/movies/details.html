@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Szczegóły filmu')}">
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+  <!-- Szczegóły filmu -->
+  <div class="row">
+    <!-- Plakat -->
+    <div class="col-md-4">
+      <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}"
+           class="img-fluid rounded" alt="Movie poster">
+    </div>
+
+    <!-- Informacje o filmie -->
+    <div class="col-md-8">
+      <h1 th:text="${movie.title}">Tytuł filmu</h1>
+      <div class="mb-3">
+                    <span class="badge bg-secondary me-2"
+                          th:each="genre : ${movie.genres}"
+                          th:text="${genre.name}">Gatunek</span>
+      </div>
+
+      <p class="lead" th:text="${movie.description}">Opis filmu</p>
+
+      <div class="mb-3">
+        <h5>Obsada:</h5>
+        <span th:each="actor : ${movie.cast}" class="me-3">
+                        <span th:text="${actor.firstName}">Aktor</span>
+                    </span>
+      </div>
+
+      <div class="mb-3">
+        <h5>Szczegóły:</h5>
+        <p>
+          <strong>Data premiery:</strong>
+          <span th:text="${#temporals.format(movie.releaseDate, 'dd.MM.yyyy')}">01.01.2024</span>
+        </p>
+        <p>
+          <strong>Średnia ocena:</strong>
+          <i class="bi bi-star-fill text-warning"></i>
+          <span th:text="${movie.averageRating > 0 ?
+                                     #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
+                                     'Brak ocen'}">4.5/5.0</span>
+          <span th:text="'(' + ${#lists.size(movie.reviews)} + ' recenzji)'"></span>
+        </p>
+      </div>
+
+      <!-- Trailer -->
+      <div class="mb-3" th:if="${movie.trailerUrl}">
+        <h5>Zwiastun:</h5>
+        <div class="ratio ratio-16x9">
+          <iframe th:src="${movie.trailerUrl}"
+                  allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sekcja recenzji -->
+  <div class="mt-5">
+    <h2>Recenzje</h2>
+    <div class="mb-4">
+      <a href="#" class="btn btn-primary">Dodaj recenzję</a>
+    </div>
+
+    <!-- Lista recenzji -->
+    <div class="row">
+      <div class="col-md-12" th:each="review : ${movie.reviews}">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <h5 class="card-title" th:text="${review.user.username}">Użytkownik</h5>
+              <div>
+                <i class="bi bi-star-fill text-warning"></i>
+                <span th:text="${review.rating + '/5'}">5/5</span>
+              </div>
+            </div>
+            <p class="card-text" th:text="${review.content}">Treść recenzji</p>
+            <p class="card-text">
+              <small class="text-muted"
+                     th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">
+                01.01.2024
+              </small>
+            </p>
+
+            <!-- Komentarze -->
+            <div th:if="${not #lists.isEmpty(review.comments)}" class="mt-3">
+              <h6>Komentarze:</h6>
+              <div class="ms-4" th:each="comment : ${review.comments}">
+                <div class="border-start border-2 ps-3 mb-2">
+                  <strong th:text="${comment.user.username}">Użytkownik</strong>
+                  <p class="mb-1" th:text="${comment.content}">Treść komentarza</p>
+                  <small class="text-muted"
+                         th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy')}">
+                    01.01.2024
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

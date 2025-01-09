@@ -7,11 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/movies")
-@CrossOrigin(origins = "*")
 public class MovieController {
     private final MovieService movieService;
 
@@ -19,49 +19,69 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<?> getPopularMovies() {
-        return ResponseEntity.ok(movieService.getMostPopularMovies());
-    }
-
     @GetMapping
-    public ResponseEntity<Page<Movie>> getAllMovies(
+    public String showMoviesList(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "title") String sortBy
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            Model model
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
-        return ResponseEntity.ok(movieService.getAllMovies(pageRequest));
+        Page<Movie> movies = movieService.getAllMovies(pageRequest);
+
+        model.addAttribute("movies", movies);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("sortBy", sortBy);
+        return "movies/list";
     }
 
+
     @GetMapping("/{id}")
-    public ResponseEntity<Movie> getMovie(@PathVariable Long id) {
-        return ResponseEntity.ok(movieService.getMovieById(id));
+    public String showMovieDetails(@PathVariable Long id, Model model) {
+        Movie movie = movieService.getMovieById(id);
+        model.addAttribute("movie", movie);
+        return "movies/details";
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Movie>> searchMovies(
+    public String searchMovies(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false) String castMember,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "12") int size,
+            Model model
     ) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        return ResponseEntity.ok(movieService.searchMovies(title, genre, castMember, pageRequest));
+        Page<Movie> movies = movieService.searchMovies(title, genre, castMember, pageRequest);
+
+        model.addAttribute("movies", movies);
+        model.addAttribute("title", title);
+        model.addAttribute("genre", genre);
+        model.addAttribute("castMember", castMember);
+        return "movies/search-results";
+    }
+
+    @GetMapping("/api/popular")
+    @ResponseBody
+    public ResponseEntity<?> getPopularMovies() {
+        return ResponseEntity.ok(movieService.getMostPopularMovies());
     }
 
     @PostMapping
+    @ResponseBody
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
         return ResponseEntity.ok(movieService.addMovie(movie));
     }
 
     @PutMapping("/{id}")
+    @ResponseBody
     public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
         return ResponseEntity.ok(movieService.updateMovie(id, movie));
     }
 
     @DeleteMapping("/{id}")
+    @ResponseBody
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
         return ResponseEntity.ok().build();
