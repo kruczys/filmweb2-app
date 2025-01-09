@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Wyniki wyszukiwania')}">
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+  <!-- Wyszukiwarka z filtrami -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form action="/movies/search" method="get" class="row g-3">
+        <div class="col-md-4">
+          <label for="title" class="form-label">Tytuł</label>
+          <input type="text" class="form-control" id="title" name="title"
+                 th:value="${title}">
+        </div>
+        <div class="col-md-3">
+          <label for="genre" class="form-label">Gatunek</label>
+          <input type="text" class="form-control" id="genre" name="genre"
+                 th:value="${genre}">
+        </div>
+        <div class="col-md-3">
+          <label for="castMember" class="form-label">Aktor/Aktorka</label>
+          <input type="text" class="form-control" id="castMember" name="castMember"
+                 th:value="${castMember}">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">&nbsp;</label>
+          <button type="submit" class="btn btn-primary w-100">Szukaj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Wyniki wyszukiwania -->
+  <h2 class="mb-4">Wyniki wyszukiwania
+    <small class="text-muted" th:text="'(' + ${movies.totalElements} + ' znalezionych)'"></small>
+  </h2>
+
+  <!-- Brak wyników -->
+  <div th:if="${!movies}" class="alert alert-info">
+    Nie znaleziono filmów spełniających podane kryteria.
+  </div>
+
+  <!-- Lista filmów -->
+  <div th:if="${movies}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    <div class="col" th:each="movie : ${movies}">
+      <div class="card h-100">
+        <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}"
+             class="card-img-top" alt="Movie poster">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
+          <p class="card-text text-muted"
+             th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+          <p class="card-text"
+             th:text="${#strings.length(movie.description) > 100 ?
+                                    #strings.substring(movie.description,0,100) + '...' :
+                                    movie.description}">
+          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            <a th:href="@{/movies/{id}(id=${movie.id})}"
+               class="btn btn-primary">Szczegóły</a>
+            <small class="text-muted">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span th:text="${movie.averageRating > 0 ?
+                                               #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
+                                               'Brak ocen'}">
+                                </span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginacja -->
+  <nav th:if="${movies.totalPages > 1}" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" th:classappend="${movies.first ? 'disabled' : ''}">
+        <a class="page-link" th:href="@{/movies/search(
+                        page=${movies.number - 1},
+                        size=${movies.size},
+                        title=${title},
+                        genre=${genre},
+                        castMember=${castMember}
+                    )}">Poprzednia</a>
+      </li>
+
+      <li class="page-item"
+          th:each="pageNum : ${#numbers.sequence(0, movies.totalPages - 1)}"
+          th:classappend="${pageNum == movies.number ? 'active' : ''}">
+        <a class="page-link" th:href="@{/movies/search(
+                        page=${pageNum},
+                        size=${movies.size},
+                        title=${title},
+                        genre=${genre},
+                        castMember=${castMember}
+                    )}" th:text="${pageNum + 1}">1</a>
+      </li>
+
+      <li class="page-item" th:classappend="${movies.last ? 'disabled' : ''}">
+        <a class="page-link" th:href="@{/movies/search(
+                        page=${movies.number + 1},
+                        size=${movies.size},
+                        title=${title},
+                        genre=${genre},
+                        castMember=${castMember}
+                    )}">Następna</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
