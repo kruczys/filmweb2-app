@@ -1,11 +1,10 @@
 package com.example.movieservice.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.HashSet;
 
 @Data
 @Entity
@@ -24,51 +23,38 @@ public class Movie {
     @Column(name = "release_date")
     private LocalDateTime releaseDate;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "view_count")
+    private Long viewCount = 0L;
+
     @ManyToMany
     @JoinTable(
             name = "movie_cast",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "cast_member_id")
     )
-    private Set<CastMember> cast;
+    private Set<CastMember> cast = new HashSet<>();
 
     @ManyToMany
-    private Set<Genre> genres;
+    private Set<Genre> genres = new HashSet<>();
 
     private String imageUrl;
-
     private String trailerUrl;
 
-    @OneToMany(mappedBy = "movie")
-    private Set<Review> reviews;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    private Set<Review> reviews = new HashSet<>();
 
     @ManyToMany(mappedBy = "favoriteMovies")
-    private Set<User> favoritedBy;
+    private Set<User> favoritedBy = new HashSet<>();
 
     @ManyToMany(mappedBy = "watchList")
-    private Set<User> inWatchlistOf;
-
-    @ManyToMany(mappedBy = "ignoredMovies")
-    private Set<User> ignoredBy;
-
-    @Column(name = "view_count")
-    private Long viewCount = 0L;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Set<User> inWatchlistOf = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-    }
-
-    public double getAverageRating() {
-        if (reviews == null || reviews.isEmpty()) {
-            return 0.0;
-        }
-        return reviews.stream()
-                .mapToInt(Review::getRating)
-                .average()
-                .orElse(0.0);
+        viewCount = 0L;
     }
 }

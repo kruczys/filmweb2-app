@@ -1,14 +1,15 @@
 package com.example.movieservice.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.HashSet;
 
 @Data
 @Entity
+@Table(name = "reviews")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,16 +17,27 @@ public class Review {
 
     private int rating;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @OneToMany(mappedBy = "review")
-    private Set<Comment> comments;
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
 
-    private LocalDate createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    private boolean moderated = false;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
