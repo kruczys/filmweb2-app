@@ -39,12 +39,12 @@
   </h2>
 
   <!-- Brak wyników -->
-  <div th:if="${!movies}" class="alert alert-info">
+  <div th:if="${movies.content.isEmpty()}" class="alert alert-info">
     Nie znaleziono filmów spełniających podane kryteria.
   </div>
 
   <!-- Lista filmów -->
-  <div th:if="${movies}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+  <div th:if="${!movies.content.isEmpty()}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     <div class="col" th:each="movie : ${movies}">
       <div class="card h-100">
         <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}"
@@ -66,7 +66,7 @@
               <span th:text="${movie.averageRating > 0 ?
                                                #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
                                                'Brak ocen'}">
-                                </span>
+              </span>
             </small>
           </div>
         </div>
