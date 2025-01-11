@@ -16,23 +16,30 @@
           <div th:if="${param.error}" class="alert alert-danger">
             Nieprawidłowa nazwa użytkownika lub hasło.
           </div>
-          <div th:if="${param.registered}" class="alert alert-success">
-            Rejestracja przebiegła pomyślnie. Możesz się teraz zalogować.
+          <div th:if="${param.logout}" class="alert alert-success">
+            Zostałeś wylogowany.
           </div>
+          <div th:if="${param.registered}" class="alert alert-success">
+            Rejestracja przebiegła pomyślnie. Możesz się zalogować.
+          </div>
+
           <form th:action="@{/auth/login-process}" method="post">
             <div class="mb-3">
               <label for="username" class="form-label">Nazwa użytkownika</label>
               <input type="text" class="form-control" id="username"
-                     name="username" required>
+                     name="username" required autofocus>
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Hasło</label>
               <input type="password" class="form-control" id="password"
                      name="password" required>
             </div>
-            <button type="submit" class="btn btn-primary">Zaloguj</button>
-            <a href="/auth/register" class="btn btn-link">Zarejestruj się</a>
+            <button type="submit" class="btn btn-primary w-100">Zaloguj</button>
           </form>
+
+          <div class="mt-3 text-center">
+            <p>Nie masz konta? <a th:href="@{/auth/register}">Zarejestruj się</a></p>
+          </div>
         </div>
       </div>
     </div>

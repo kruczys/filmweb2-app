@@ -17,33 +17,53 @@
             <div class="mb-3">
               <label for="username" class="form-label">Nazwa użytkownika</label>
               <input type="text" class="form-control" id="username"
-                     th:field="*{username}" required>
-              <div class="text-danger"
+                     th:field="*{username}"
+                     th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
+              <div class="invalid-feedback"
                    th:if="${#fields.hasErrors('username')}"
                    th:errors="*{username}">
               </div>
             </div>
+
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <input type="email" class="form-control" id="email"
-                     th:field="*{email}" required>
-              <div class="text-danger"
+                     th:field="*{email}"
+                     th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+              <div class="invalid-feedback"
                    th:if="${#fields.hasErrors('email')}"
                    th:errors="*{email}">
               </div>
             </div>
+
             <div class="mb-3">
               <label for="password" class="form-label">Hasło</label>
               <input type="password" class="form-control" id="password"
-                     th:field="*{password}" required>
-              <div class="text-danger"
+                     th:field="*{password}"
+                     th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+              <div class="invalid-feedback"
                    th:if="${#fields.hasErrors('password')}"
                    th:errors="*{password}">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Zarejestruj się</button>
-            <a href="/auth/login" class="btn btn-link">Masz już konto? Zaloguj się</a>
+
+            <div class="mb-3">
+              <label for="passwordConfirm" class="form-label">Potwierdź hasło</label>
+              <input type="password" class="form-control" id="passwordConfirm"
+                     th:field="*{passwordConfirm}"
+                     th:classappend="${#fields.hasErrors('passwordConfirm')} ? 'is-invalid'">
+              <div class="invalid-feedback"
+                   th:if="${#fields.hasErrors('passwordConfirm')}"
+                   th:errors="*{passwordConfirm}">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Zarejestruj</button>
           </form>
+
+          <div class="mt-3 text-center">
+            <p>Masz już konto? <a th:href="@{/auth/login}">Zaloguj się</a></p>
+          </div>
         </div>
       </div>
     </div>
