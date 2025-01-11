@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Modal dodawania filmu -->
+<div th:fragment="addMovieModal" class="modal fade" id="addMovieModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dodaj nowy film</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMovieForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Tytuł</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Opis</label>
+                        <textarea class="form-control" id="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="releaseDate" class="form-label">Data premiery</label>
+                        <input type="date" class="form-control" id="releaseDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="imageUrl" class="form-label">URL plakatu</label>
+                        <input type="url" class="form-control" id="imageUrl">
+                    </div>
+                    <div class="mb-3">
+                        <label for="trailerUrl" class="form-label">URL zwiastunu</label>
+                        <input type="url" class="form-control" id="trailerUrl">
+                    </div>
+                    <div class="mb-3">
+                        <label for="genres" class="form-label">Gatunki</label>
+                        <select multiple class="form-select" id="genres">
+                            <option th:each="genre : ${genres}" 
+                                    th:value="${genre.id}" 
+                                    th:text="${genre.name}">
+                                Gatunek
+                            </option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <button type="button" class="btn btn-primary" onclick="saveMovie()">Zapisz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal edycji filmu -->
+<div th:fragment="editMovieModal" class="modal fade" id="editMovieModal" tabindex="-1">
+    <!-- Podobna struktura jak addMovieModal, ale z wypełnionymi danymi -->
+</div>
+</body>
+</html> 

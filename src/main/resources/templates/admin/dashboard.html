@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{fragments/layout :: head('Panel Administratora')}">
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-bs-toggle="tab" data-bs-target="#dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#movies">
+                            <i class="bi bi-film"></i> Filmy
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#users">
+                            <i class="bi bi-people"></i> Użytkownicy
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#reviews">
+                            <i class="bi bi-star"></i> Recenzje
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#genres">
+                            <i class="bi bi-tags"></i> Gatunki
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Główna zawartość -->
+        <main class="col-md-10 ms-sm-auto px-md-4">
+            <div class="tab-content">
+                <!-- Dashboard -->
+                <div class="tab-pane fade show active" id="dashboard">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Dashboard</h1>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-primary mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Filmy</h5>
+                                    <p class="card-text display-6" th:text="${stats.movieCount}">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Użytkownicy</h5>
+                                    <p class="card-text display-6" th:text="${stats.userCount}">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Recenzje</h5>
+                                    <p class="card-text display-6" th:text="${stats.reviewCount}">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Gatunki</h5>
+                                    <p class="card-text display-6" th:text="${stats.genreCount}">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wykres aktywności -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Aktywność w ostatnim tygodniu</h5>
+                                    <canvas id="activityChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zarządzanie filmami -->
+                <div class="tab-pane fade" id="movies">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Zarządzanie filmami</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                                    data-bs-target="#addMovieModal">
+                                <i class="bi bi-plus"></i> Dodaj film
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tytuł</th>
+                                    <th>Data premiery</th>
+                                    <th>Średnia ocena</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="movie : ${movies}">
+                                    <td th:text="${movie.id}">1</td>
+                                    <td th:text="${movie.title}">Tytuł filmu</td>
+                                    <td th:text="${#temporals.format(movie.releaseDate, 'dd.MM.yyyy')}">
+                                        01.01.2024
+                                    </td>
+                                    <td>
+                                        <span th:text="${movie.averageRating}">4.5</span>/5
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" 
+                                                th:onclick="'editMovie(' + ${movie.id} + ')'">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" 
+                                                th:onclick="'deleteMovie(' + ${movie.id} + ')'">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Zarządzanie użytkownikami -->
+                <div class="tab-pane fade" id="users">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Zarządzanie użytkownikami</h1>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nazwa użytkownika</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}">1</td>
+                                    <td th:text="${user.username}">user123</td>
+                                    <td th:text="${user.email}">user@example.com</td>
+                                    <td>
+                                        <span class="badge bg-success" 
+                                              th:if="${user.enabled}">Aktywny</span>
+                                        <span class="badge bg-danger" 
+                                              th:unless="${user.enabled}">Zablokowany</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" 
+                                                th:onclick="'editUser(' + ${user.id} + ')'">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" 
+                                                th:if="${user.enabled}"
+                                                th:onclick="'blockUser(' + ${user.id} + ')'">
+                                            <i class="bi bi-lock"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" 
+                                                th:unless="${user.enabled}"
+                                                th:onclick="'unblockUser(' + ${user.id} + ')'">
+                                            <i class="bi bi-unlock"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Zarządzanie recenzjami -->
+                <div class="tab-pane fade" id="reviews">
+                    <!-- Podobna struktura jak dla filmów -->
+                </div>
+
+                <!-- Zarządzanie gatunkami -->
+                <div class="tab-pane fade" id="genres">
+                    <!-- Podobna struktura jak dla filmów -->
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modalne okna -->
+<div th:replace="~{admin/modals/movie-modal :: addMovieModal}"></div>
+<div th:replace="~{admin/modals/movie-modal :: editMovieModal}"></div>
+<div th:replace="~{admin/modals/user-modal :: editUserModal}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+// Wykres aktywności
+const activityData = /*[[${activityData}]]*/ {};
+const ctx = document.getElementById('activityChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: activityData.labels,
+        datasets: [{
+            label: 'Nowe recenzje',
+            data: activityData.reviews,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }, {
+            label: 'Nowi użytkownicy',
+            data: activityData.users,
+            borderColor: 'rgb(255, 99, 132)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Funkcje zarządzania
+function editMovie(id) {
+    fetch(`/api/admin/movies/${id}`)
+        .then(response => response.json())
+        .then(movie => {
+            // Wypełnij formularz danymi
+            document.getElementById('editMovieId').value = movie.id;
+            document.getElementById('editMovieTitle').value = movie.title;
+            // ... pozostałe pola
+            $('#editMovieModal').modal('show');
+        });
+}
+
+function deleteMovie(id) {
+    if (confirm('Czy na pewno chcesz usunąć ten film?')) {
+        fetch(`/api/admin/movies/${id}`, {
+            method: 'DELETE'
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+}
+
+// Podobne funkcje dla użytkowników i innych encji
+</script>
+</body>
+</html> 

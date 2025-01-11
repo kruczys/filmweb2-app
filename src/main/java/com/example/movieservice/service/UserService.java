@@ -4,6 +4,7 @@ import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
 import com.example.movieservice.model.enums.Role;
 import com.example.movieservice.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,25 +13,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Użytkownik nie znaleziony: " + username));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
@@ -41,14 +40,21 @@ public class UserService implements UserDetailsService {
 
     public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException("Email już istnieje");
         }
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new RuntimeException("Nazwa użytkownika już istnieje");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
+        user.setEnabled(true);
+        user.setRegistrationDate(LocalDateTime.now());
+        user.setLastLogin(LocalDateTime.now());
+        user.setFavoriteMovies(new HashSet<>());
+        user.setWatchList(new HashSet<>());
+        user.setIgnoredMovies(new HashSet<>());
+
         return userRepository.save(user);
     }
 

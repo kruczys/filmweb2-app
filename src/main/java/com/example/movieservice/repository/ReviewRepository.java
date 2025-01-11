@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByMovieId(Long movieId);
@@ -21,4 +22,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r ORDER BY r.createdAt DESC")
     List<Review> findLatestReviews(Pageable pageable);
+
+    List<Review> findByCreatedAtAfter(LocalDateTime date);
+
+    @Query("SELECT AVG(r.rating) FROM Review r")
+    Double getAverageRating();
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.moderated = :moderated")
+    long countByModerated(boolean moderated);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.createdAt < :date")
+    long countByCreatedAtBefore(LocalDateTime date);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.createdAt > :date")
+    long countByCreatedAtAfter(LocalDateTime date);
 }

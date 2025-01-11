@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
@@ -17,4 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    List<User> findByRegistrationDateAfter(LocalDateTime date);
+
+    long countByLastLoginAfter(LocalDateTime date);
+
+    long countByRegistrationDateAfter(LocalDateTime date);
+
+    long countByRegistrationDateBefore(LocalDateTime date);
 }

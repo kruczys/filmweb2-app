@@ -4,21 +4,25 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
 @Entity
+@Table(name = "movies")
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private LocalDate releaseDate;
+    @Column(name = "release_date")
+    private LocalDateTime releaseDate;
 
     @ManyToMany
     @JoinTable(
@@ -46,6 +50,17 @@ public class Movie {
 
     @ManyToMany(mappedBy = "ignoredMovies")
     private Set<User> ignoredBy;
+
+    @Column(name = "view_count")
+    private Long viewCount = 0L;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     public double getAverageRating() {
         if (reviews == null || reviews.isEmpty()) {
