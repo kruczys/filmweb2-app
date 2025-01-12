@@ -119,11 +119,6 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteMovie(Long movieId) {
-        movieRepository.deleteById(movieId);
-    }
-
-    @Transactional
     public void deleteReview(Long reviewId) {
         reviewRepository.deleteById(reviewId);
     }

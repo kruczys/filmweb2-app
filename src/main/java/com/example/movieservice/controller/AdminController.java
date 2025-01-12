@@ -42,12 +42,6 @@ public class AdminController {
         adminService.unblockUser(id);
     }
 
-    @DeleteMapping("/movies/{id}")
-    @ResponseBody
-    public void deleteMovie(@PathVariable Long id) {
-        adminService.deleteMovie(id);
-    }
-
     @DeleteMapping("/reviews/{id}")
     @ResponseBody
     public void deleteReview(@PathVariable Long id) {
