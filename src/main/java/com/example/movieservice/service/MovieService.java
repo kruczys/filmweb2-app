@@ -1,12 +1,17 @@
 package com.example.movieservice.service;
 
+import com.example.movieservice.dto.MovieDTO;
+import com.example.movieservice.model.Genre;
 import com.example.movieservice.model.Movie;
+import com.example.movieservice.model.Review;
 import com.example.movieservice.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -46,8 +51,49 @@ public class MovieService {
         return movieRepository.findAll(pageable);
     }
 
-    public Movie addMovie(Movie movie) {
-        return movieRepository.save(movie);
+    public MovieDTO addMovie(MovieDTO movieDTO) {
+        Movie movie = new Movie();
+        movie.setTitle(movieDTO.getTitle());
+        movie.setDescription(movieDTO.getDescription());
+        movie.setReleaseDate(movieDTO.getReleaseDate());
+        movie.setImageUrl(movieDTO.getImageUrl());
+        movie.setTrailerUrl(movieDTO.getTrailerUrl());
+
+        if (movieDTO.getGenreIds() != null && !movieDTO.getGenreIds().isEmpty()) {
+            Set<Genre> genres = movieDTO.getGenreIds().stream()
+                .map(genreId -> genreRepository.findById(genreId)
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono gatunku o ID: " + genreId)))
+                .collect(Collectors.toSet());
+            movie.setGenres(genres);
+        }
+
+        Movie savedMovie = movieRepository.save(movie);
+        return convertToDTO(savedMovie);
+    }
+
+    private MovieDTO convertToDTO(Movie movie) {
+        MovieDTO dto = new MovieDTO();
+        dto.setId(movie.getId());
+        dto.setTitle(movie.getTitle());
+        dto.setDescription(movie.getDescription());
+        dto.setReleaseDate(movie.getReleaseDate());
+        dto.setImageUrl(movie.getImageUrl());
+        dto.setTrailerUrl(movie.getTrailerUrl());
+        dto.setGenreIds(movie.getGenres().stream()
+            .map(Genre::getId)
+            .collect(Collectors.toList()));
+        dto.setAverageRating(calculateAverageRating(movie));
+        return dto;
+    }
+
+    private Double calculateAverageRating(Movie movie) {
+        if (movie.getReviews() == null || movie.getReviews().isEmpty()) {
+            return 0.0;
+        }
+        return movie.getReviews().stream()
+            .mapToDouble(Review::getRating)
+            .average()
+            .orElse(0.0);
     }
 
     public Movie updateMovie(Long id, Movie movieDetails) {

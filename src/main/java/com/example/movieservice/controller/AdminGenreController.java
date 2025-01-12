@@ -1,6 +1,7 @@
 package com.example.movieservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,12 @@ public class AdminGenreController {
     
     @PostMapping
     @ResponseBody
-    public Genre addGenre(@RequestBody Genre genre) {
-        return genreService.addGenre(genre);
+    public ResponseEntity<?> addGenre(@RequestBody Genre genre) {
+        try {
+            return ResponseEntity.ok(genreService.addGenre(genre));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     
     @DeleteMapping("/{id}")

@@ -180,7 +180,7 @@
                                                 th:onclick="'editUser(' + ${user.id} + ')'">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-danger" 
+                                        <button class="btn btn-sm btn-warning" 
                                                 th:if="${user.enabled}"
                                                 th:onclick="'blockUser(' + ${user.id} + ')'">
                                             <i class="bi bi-lock"></i>
@@ -199,7 +199,41 @@
 
                 <!-- Zarządzanie recenzjami -->
                 <div class="tab-pane fade" id="reviews">
-                    <!-- Podobna struktura jak dla filmów -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Zarządzanie recenzjami</h1>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Film</th>
+                                    <th>Użytkownik</th>
+                                    <th>Ocena</th>
+                                    <th>Treść</th>
+                                    <th>Data</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="review : ${reviews}">
+                                    <td th:text="${review.id}">1</td>
+                                    <td th:text="${review.movie.title}">Tytuł filmu</td>
+                                    <td th:text="${review.user.username}">Użytkownik</td>
+                                    <td th:text="${review.rating}">5</td>
+                                    <td th:text="${review.content}">Treść recenzji</td>
+                                    <td th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" 
+                                                th:onclick="'deleteReview(' + ${review.id} + ')'">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Zarządzanie gatunkami -->
@@ -249,6 +283,7 @@
 <div th:replace="~{admin/modals/user-modal :: editUserModal}"></div>
 <div th:replace="~{admin/modals/genre-modal :: addGenreModal}"></div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
 // Wykres aktywności
@@ -319,13 +354,17 @@ function addGenre() {
         },
         body: JSON.stringify({ name: genreName })
     })
-    .then(response => {
+    .then(async response => {
         if (response.ok) {
-            $('#addGenreModal').modal('hide');
+            document.getElementById('addGenreModal').querySelector('.btn-close').click();
             location.reload();
         } else {
-            alert('Wystąpił błąd podczas dodawania gatunku');
+            const errorData = await response.text();
+            alert('Wystąpił błąd: ' + errorData);
         }
+    })
+    .catch(error => {
+        alert('Wystąpił błąd podczas dodawania gatunku: ' + error);
     });
 }
 
@@ -339,6 +378,100 @@ function deleteGenre(id) {
                 location.reload();
             } else {
                 alert('Wystąpił błąd podczas usuwania gatunku');
+            }
+        });
+    }
+}
+
+function saveMovie() {
+    const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const releaseDate = document.getElementById('releaseDate').value;
+    const imageUrl = document.getElementById('imageUrl').value;
+    const trailerUrl = document.getElementById('trailerUrl').value;
+    const genresSelect = document.getElementById('genres');
+    const selectedGenres = Array.from(genresSelect.selectedOptions).map(option => parseInt(option.value));
+
+    if (!title || !description || !releaseDate) {
+        alert('Wypełnij wszystkie wymagane pola');
+        return;
+    }
+
+    const movie = {
+        title: title,
+        description: description,
+        releaseDate: releaseDate,
+        imageUrl: imageUrl,
+        trailerUrl: trailerUrl,
+        genreIds: selectedGenres
+    };
+
+    fetch('/admin/movies/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [header]: token
+        },
+        body: JSON.stringify(movie)
+    })
+    .then(async response => {
+        if (response.ok) {
+            document.getElementById('addMovieModal').querySelector('.btn-close').click();
+            location.reload();
+        } else {
+            const errorData = await response.text();
+            alert('Wystąpił błąd: ' + errorData);
+        }
+    })
+    .catch(error => {
+        console.error('Błąd:', error);
+        alert('Wystąpił błąd podczas dodawania filmu: ' + error);
+    });
+}
+
+function blockUser(userId) {
+    if (confirm('Czy na pewno chcesz zablokować tego użytkownika?')) {
+        fetch(`/api/admin/users/${userId}/block`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas blokowania użytkownika');
+            }
+        });
+    }
+}
+
+function unblockUser(userId) {
+    if (confirm('Czy na pewno chcesz odblokować tego użytkownika?')) {
+        fetch(`/api/admin/users/${userId}/unblock`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas odblokowania użytkownika');
+            }
+        });
+    }
+}
+
+function deleteReview(reviewId) {
+    if (confirm('Czy na pewno chcesz usunąć tę recenzję?')) {
+        fetch(`/api/admin/reviews/${reviewId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania recenzji');
             }
         });
     }

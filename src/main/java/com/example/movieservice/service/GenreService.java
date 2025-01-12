@@ -3,6 +3,7 @@ package com.example.movieservice.service;
 import com.example.movieservice.model.Genre;
 import com.example.movieservice.repository.GenreRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,11 +11,8 @@ import java.util.List;
 @Service
 @Transactional
 public class GenreService {
-    private final GenreRepository genreRepository;
-
-    public GenreService(GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
-    }
+    @Autowired
+    private GenreRepository genreRepository;
 
     public Genre getGenreById(Long id) {
         return genreRepository.findById(id)
@@ -31,6 +29,9 @@ public class GenreService {
     }
 
     public Genre addGenre(Genre genre) {
+        if (genreRepository.existsByName(genre.getName())) {
+            throw new RuntimeException("Gatunek o tej nazwie już istnieje");
+        }
         return genreRepository.save(genre);
     }
 

@@ -5,6 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -21,7 +22,7 @@ public class Movie {
     private String description;
 
     @Column(name = "release_date")
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

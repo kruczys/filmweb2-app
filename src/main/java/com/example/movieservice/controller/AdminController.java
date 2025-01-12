@@ -6,9 +6,11 @@ import com.example.movieservice.model.Genre;
 import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
 import com.example.movieservice.service.AdminService;
+import com.example.movieservice.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,17 +24,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
     private final AdminService adminService;
+    private final GenreService genreService;
 
     @GetMapping
-    public String dashboard(Model model) {
-        AdminDashboardStats stats = adminService.getDashboardStats();
-        ActivityData activityData = adminService.getActivityData();
-        
-        model.addAttribute("stats", stats);
-        model.addAttribute("activityData", activityData);
-        model.addAttribute("movies", adminService.getMovies(PageRequest.of(0, 10)));
-        model.addAttribute("users", adminService.getUsers(PageRequest.of(0, 10)));
-        
+    public String dashboard(Model model, Pageable pageable) {
+        model.addAttribute("stats", adminService.getDashboardStats());
+        model.addAttribute("movies", adminService.getMovies(pageable));
+        model.addAttribute("users", adminService.getUsers(pageable));
+        model.addAttribute("reviews", adminService.getReviews(pageable));
+        model.addAttribute("genres", genreService.getAllGenres());
         return "admin/dashboard";
     }
 
@@ -69,7 +69,7 @@ public class AdminController {
     @GetMapping("/genres")
     @ResponseBody
     public List<Genre> getGenres() {
-        return adminService.getAllGenres();
+        return genreService.getAllGenres();
     }
 
     @PostMapping("/genres")

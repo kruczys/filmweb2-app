@@ -1,5 +1,6 @@
 package com.example.movieservice.controller;
 
+import com.example.movieservice.dto.MovieDTO;
 import com.example.movieservice.model.Movie;
 import com.example.movieservice.service.MovieService;
 import org.springframework.data.domain.Page;
@@ -70,8 +71,8 @@ public class MovieController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
-        return ResponseEntity.ok(movieService.addMovie(movie));
+    public ResponseEntity<MovieDTO> addMovie(@RequestBody MovieDTO movieDTO) {
+        return ResponseEntity.ok(movieService.addMovie(movieDTO));
     }
 
     @PutMapping("/{id}")
