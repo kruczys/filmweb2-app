@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="addGenreModal" class="modal fade" id="addGenreModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dodaj nowy gatunek</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addGenreForm">
+                    <div class="mb-3">
+                        <label for="genreName" class="form-label">Nazwa gatunku</label>
+                        <input type="text" class="form-control" id="genreName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <button type="button" class="btn btn-primary" onclick="addGenre()">Zapisz</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html> 

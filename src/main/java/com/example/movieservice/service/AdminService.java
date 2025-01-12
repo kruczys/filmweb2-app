@@ -39,8 +39,9 @@ public class AdminService {
         stats.setGenreCount(genreRepository.count());
         
         // Statystyki ogólne
-        stats.setTotalViews(movieRepository.getTotalViews());
-        stats.setAverageRating(reviewRepository.getAverageRating());
+        stats.setTotalViews(movieRepository.getTotalViews() != null ? movieRepository.getTotalViews() : 0L);
+        Double avgRating = reviewRepository.getAverageRating();
+        stats.setAverageRating(avgRating != null ? avgRating : 0.0);
         stats.setActiveUsers(userRepository.countByLastLoginAfter(monthAgo));
         stats.setPendingReviews(reviewRepository.countByModerated(false));
         
@@ -62,8 +63,8 @@ public class AdminService {
     }
 
     private double calculateGrowthRate(long previous, long current) {
-        if (previous == 0) return 100.0;
-        return ((double) (current - previous) / previous) * 100;
+        if (previous == 0) return current > 0 ? 100.0 : 0.0;
+        return ((double) (current - previous) / previous) * 100.0;
     }
 
     public ActivityData getActivityData() {

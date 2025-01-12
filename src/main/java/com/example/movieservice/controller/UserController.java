@@ -7,6 +7,11 @@ import com.example.movieservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
@@ -75,5 +80,16 @@ public class UserController {
         Movie movie = movieService.getMovieById(movieId);
         userService.removeFromIgnored(userId, movie);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/profile")
+    public String showProfile(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+        
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "user/profile";
     }
 }

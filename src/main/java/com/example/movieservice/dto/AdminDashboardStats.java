@@ -8,20 +8,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminDashboardStats {
-    private long movieCount;
-    private long userCount;
-    private long reviewCount;
-    private long genreCount;
+    private Long movieCount;
+    private Long userCount;
+    private Long reviewCount;
+    private Long genreCount;
     
-    private long totalViews;
-    private double averageRating;
-    private long activeUsers;
-    private long pendingReviews;
+    private Long totalViews;
+    private Double averageRating;
+    private Long activeUsers;
+    private Long pendingReviews;
     
-    private double userGrowthRate;
-    private double reviewGrowthRate;
+    private Double userGrowthRate;
+    private Double reviewGrowthRate;
     
-    private long monthlyActiveUsers;
-    private long monthlyNewReviews;
-    private long monthlyNewMovies;
+    private Long monthlyActiveUsers;
+    private Long monthlyNewReviews;
+    private Long monthlyNewMovies;
 } 

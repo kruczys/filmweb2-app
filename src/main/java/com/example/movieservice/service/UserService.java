@@ -5,6 +5,7 @@ import com.example.movieservice.model.User;
 import com.example.movieservice.model.enums.Role;
 import com.example.movieservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -159,5 +160,10 @@ public class UserService implements UserDetailsService {
     public Set<Movie> getIgnoredMovies(Long userId) {
         User user = getUserById(userId);
         return user.getIgnoredMovies();
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Użytkownik nie znaleziony: " + username));
     }
 }

@@ -204,7 +204,39 @@
 
                 <!-- Zarządzanie gatunkami -->
                 <div class="tab-pane fade" id="genres">
-                    <!-- Podobna struktura jak dla filmów -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Zarządzanie gatunkami</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                                    data-bs-target="#addGenreModal">
+                                <i class="bi bi-plus"></i> Dodaj gatunek
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nazwa</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="genre : ${genres}">
+                                    <td th:text="${genre.id}">1</td>
+                                    <td th:text="${genre.name}">Akcja</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" 
+                                                th:onclick="'deleteGenre(' + ${genre.id} + ')'">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
@@ -215,6 +247,7 @@
 <div th:replace="~{admin/modals/movie-modal :: addMovieModal}"></div>
 <div th:replace="~{admin/modals/movie-modal :: editMovieModal}"></div>
 <div th:replace="~{admin/modals/user-modal :: editUserModal}"></div>
+<div th:replace="~{admin/modals/genre-modal :: addGenreModal}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
@@ -267,6 +300,45 @@ function deleteMovie(id) {
         }).then(response => {
             if (response.ok) {
                 location.reload();
+            }
+        });
+    }
+}
+
+function addGenre() {
+    const genreName = document.getElementById('genreName').value;
+    if (!genreName) {
+        alert('Nazwa gatunku jest wymagana');
+        return;
+    }
+    
+    fetch('/api/admin/genres', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: genreName })
+    })
+    .then(response => {
+        if (response.ok) {
+            $('#addGenreModal').modal('hide');
+            location.reload();
+        } else {
+            alert('Wystąpił błąd podczas dodawania gatunku');
+        }
+    });
+}
+
+function deleteGenre(id) {
+    if (confirm('Czy na pewno chcesz usunąć ten gatunek?')) {
+        fetch(`/api/admin/genres/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania gatunku');
             }
         });
     }

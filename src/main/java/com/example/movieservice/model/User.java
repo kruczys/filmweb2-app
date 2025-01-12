@@ -49,7 +49,8 @@ public class User {
     private LocalDateTime lastLogin;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @ManyToMany
     private Set<Movie> favoriteMovies = new HashSet<>();

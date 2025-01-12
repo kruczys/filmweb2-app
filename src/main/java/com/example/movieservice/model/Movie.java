@@ -38,6 +38,11 @@ public class Movie {
     private Set<CastMember> cast = new HashSet<>();
 
     @ManyToMany
+    @JoinTable(
+            name = "movies_genres",
+            joinColumns = @JoinColumn(name = "movies_id"),
+            inverseJoinColumns = @JoinColumn(name = "genres_id")
+    )
     private Set<Genre> genres = new HashSet<>();
 
     private String imageUrl;
@@ -52,9 +57,23 @@ public class Movie {
     @ManyToMany(mappedBy = "watchList")
     private Set<User> inWatchlistOf = new HashSet<>();
 
+    @Column(name = "average_rating")
+    private Double averageRating = 0.0;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         viewCount = 0L;
+    }
+
+    public void updateAverageRating() {
+        if (reviews != null && !reviews.isEmpty()) {
+            this.averageRating = reviews.stream()
+                    .mapToDouble(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+        } else {
+            this.averageRating = 0.0;
+        }
     }
 }
