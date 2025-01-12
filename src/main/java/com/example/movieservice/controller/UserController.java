@@ -8,9 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import java.security.Principal;
 
 @Controller
@@ -42,42 +39,42 @@ public class UserController {
 
     @PostMapping("/{userId}/favorites/{movieId}")
     public ResponseEntity<?> addToFavorites(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.addToFavorites(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/favorites/{movieId}")
     public ResponseEntity<?> removeFromFavorites(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.removeFromFavorites(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{userId}/watchlist/{movieId}")
     public ResponseEntity<?> addToWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.addToWatchlist(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/watchlist/{movieId}")
     public ResponseEntity<?> removeFromWatchlist(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.removeFromWatchlist(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{userId}/ignored/{movieId}")
     public ResponseEntity<?> addToIgnored(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.addToIgnored(userId, movie);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/ignored/{movieId}")
     public ResponseEntity<?> removeFromIgnored(@PathVariable Long userId, @PathVariable Long movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
         userService.removeFromIgnored(userId, movie);
         return ResponseEntity.ok().build();
     }

@@ -1,7 +1,6 @@
 package com.example.movieservice.service;
 
 import com.example.movieservice.model.Comment;
-import com.example.movieservice.model.Review;
 import com.example.movieservice.model.User;
 import com.example.movieservice.repository.CommentRepository;
 import org.springframework.data.domain.Page;

@@ -39,9 +39,14 @@ public class MovieService {
         return movieRepository.findAll(pageable);
     }
 
-    public Movie getMovieById(Long id) {
+    public Movie getMovieEntityById(Long id) {
         return movieRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
+            .orElseThrow(() -> new RuntimeException("Nie znaleziono filmu o ID: " + id));
+    }
+
+    public MovieDTO getMovieById(Long id) {
+        Movie movie = getMovieEntityById(id);
+        return convertToDTO(movie);
     }
 
     public Page<Movie> searchMovies(String title, String genre, String castMember, Pageable pageable) {
@@ -117,5 +122,26 @@ public class MovieService {
 
     public Double getAverageRating(Long movieId) {
         return reviewRepository.calculateAverageRatingForMovie(movieId);
+    }
+
+    public MovieDTO updateMovie(MovieDTO movieDTO) {
+        Movie movie = getMovieEntityById(movieDTO.getId());
+        
+        movie.setTitle(movieDTO.getTitle());
+        movie.setDescription(movieDTO.getDescription());
+        movie.setReleaseDate(movieDTO.getReleaseDate());
+        movie.setImageUrl(movieDTO.getImageUrl());
+        movie.setTrailerUrl(movieDTO.getTrailerUrl());
+
+        if (movieDTO.getGenreIds() != null && !movieDTO.getGenreIds().isEmpty()) {
+            Set<Genre> genres = movieDTO.getGenreIds().stream()
+                .map(genreId -> genreRepository.findById(genreId)
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono gatunku o ID: " + genreId)))
+                .collect(Collectors.toSet());
+            movie.setGenres(genres);
+        }
+
+        Movie updatedMovie = movieRepository.save(movie);
+        return convertToDTO(updatedMovie);
     }
 }

@@ -317,10 +317,9 @@ new Chart(ctx, {
 
 // Funkcje zarządzania
 function editMovie(id) {
-    fetch(`/api/admin/movies/${id}`)
+    fetch(`/admin/movies/${id}`)
         .then(response => response.json())
         .then(movie => {
-            // Wypełnij formularz danymi
             document.getElementById('editMovieId').value = movie.id;
             document.getElementById('editMovieTitle').value = movie.title;
             // ... pozostałe pola
@@ -330,17 +329,28 @@ function editMovie(id) {
 
 function deleteMovie(id) {
     if (confirm('Czy na pewno chcesz usunąć ten film?')) {
-        fetch(`/api/admin/movies/${id}`, {
-            method: 'DELETE'
+        const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        
+        fetch(`/admin/movies/${id}`, {
+            method: 'DELETE',
+            headers: {
+                [header]: token
+            }
         }).then(response => {
             if (response.ok) {
                 location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania filmu');
             }
         });
     }
 }
 
 function addGenre() {
+    const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    
     const genreName = document.getElementById('genreName').value;
     if (!genreName) {
         alert('Nazwa gatunku jest wymagana');
@@ -350,7 +360,8 @@ function addGenre() {
     fetch('/api/admin/genres', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            [header]: token
         },
         body: JSON.stringify({ name: genreName })
     })
@@ -383,29 +394,40 @@ function deleteGenre(id) {
     }
 }
 
-function saveMovie() {
+function saveMovie(event) {
+    event.preventDefault();
+    
     const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
     const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
     
-    const title = document.getElementById('title').value;
-    const description = document.getElementById('description').value;
-    const releaseDate = document.getElementById('releaseDate').value;
-    const imageUrl = document.getElementById('imageUrl').value;
-    const trailerUrl = document.getElementById('trailerUrl').value;
-    const genresSelect = document.getElementById('genres');
-    const selectedGenres = Array.from(genresSelect.selectedOptions).map(option => parseInt(option.value));
+    const form = document.forms.addMovieForm;
+    if (!form) {
+        console.error('Form not found');
+        return;
+    }
+
+    const title = form.title.value;
+    const description = form.description.value;
+    const releaseDate = form.releaseDate.value;
+    const imageUrl = form.imageUrl.value;
+    const trailerUrl = form.trailerUrl.value;
+    const genres = form.genres;
 
     if (!title || !description || !releaseDate) {
         alert('Wypełnij wszystkie wymagane pola');
         return;
     }
 
+    const selectedGenres = Array.from(genres.options)
+        .filter(option => option.selected)
+        .map(option => parseInt(option.value));
+
     const movie = {
-        title: title,
-        description: description,
-        releaseDate: releaseDate,
-        imageUrl: imageUrl,
-        trailerUrl: trailerUrl,
+        title,
+        description,
+        releaseDate,
+        imageUrl,
+        trailerUrl,
         genreIds: selectedGenres
     };
 
@@ -418,16 +440,17 @@ function saveMovie() {
         body: JSON.stringify(movie)
     })
     .then(async response => {
-        if (response.ok) {
-            document.getElementById('addMovieModal').querySelector('.btn-close').click();
-            location.reload();
-        } else {
+        if (!response.ok) {
             const errorData = await response.text();
+            console.error('Server response:', errorData);
             alert('Wystąpił błąd: ' + errorData);
+            return;
         }
+        document.getElementById('addMovieModal').querySelector('.btn-close').click();
+        location.reload();
     })
     .catch(error => {
-        console.error('Błąd:', error);
+        console.error('Fetch error:', error);
         alert('Wystąpił błąd podczas dodawania filmu: ' + error);
     });
 }
@@ -475,6 +498,48 @@ function deleteReview(reviewId) {
             }
         });
     }
+}
+
+function updateMovie(event) {
+    event.preventDefault();
+    
+    const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    
+    const movieId = document.getElementById('editMovieId').value;
+    const form = document.forms.editMovieForm;
+    
+    const movie = {
+        id: movieId,
+        title: form.editMovieTitle.value,
+        description: form.editMovieDescription.value,
+        releaseDate: form.editMovieReleaseDate.value,
+        imageUrl: form.editMovieImageUrl.value,
+        trailerUrl: form.editMovieTrailerUrl.value,
+        genreIds: Array.from(form.editMovieGenres.selectedOptions).map(option => parseInt(option.value))
+    };
+
+    fetch(`/api/admin/movies/${movieId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            [header]: token
+        },
+        body: JSON.stringify(movie)
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const errorData = await response.text();
+            alert('Wystąpił błąd: ' + errorData);
+            return;
+        }
+        document.getElementById('editMovieModal').querySelector('.btn-close').click();
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('Wystąpił błąd podczas aktualizacji filmu: ' + error);
+    });
 }
 
 // Podobne funkcje dla użytkowników i innych encji

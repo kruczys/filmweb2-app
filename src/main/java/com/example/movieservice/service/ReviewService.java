@@ -37,7 +37,7 @@ public class ReviewService {
 
     public Review addReview(Long userId, Long movieId, Review review) {
         User user = userService.getUserById(userId);
-        Movie movie = movieService.getMovieById(movieId);
+        Movie movie = movieService.getMovieEntityById(movieId);
 
         review.setUser(user);
         review.setMovie(movie);

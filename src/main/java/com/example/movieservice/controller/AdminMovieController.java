@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import com.example.movieservice.dto.MovieDTO;
 import com.example.movieservice.service.MovieService;
 
@@ -29,4 +28,38 @@ public class AdminMovieController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-} 
+
+    @GetMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getMovie(@PathVariable Long id) {
+        try {
+            MovieDTO movie = movieService.getMovieById(id);
+            return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> updateMovie(@PathVariable Long id, @RequestBody MovieDTO movieDTO) {
+        try {
+            movieDTO.setId(id);
+            MovieDTO updatedMovie = movieService.updateMovie(movieDTO);
+            return ResponseEntity.ok(updatedMovie);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
+        try {
+            movieService.deleteMovie(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+}

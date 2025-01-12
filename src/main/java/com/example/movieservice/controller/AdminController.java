@@ -1,15 +1,9 @@
 package com.example.movieservice.controller;
 
-import com.example.movieservice.dto.AdminDashboardStats;
-import com.example.movieservice.dto.ActivityData;
 import com.example.movieservice.model.Genre;
-import com.example.movieservice.model.Movie;
-import com.example.movieservice.model.User;
 import com.example.movieservice.service.AdminService;
 import com.example.movieservice.service.GenreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
