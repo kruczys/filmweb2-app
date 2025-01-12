@@ -5,7 +5,6 @@ import com.example.movieservice.model.User;
 import com.example.movieservice.model.enums.Role;
 import com.example.movieservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
