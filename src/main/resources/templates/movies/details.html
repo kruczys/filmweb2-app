@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Szczegóły filmu')}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
@@ -17,6 +19,20 @@
     <!-- Informacje o filmie -->
     <div class="col-md-8">
       <h1 th:text="${movie.title}">Tytuł filmu</h1>
+      <div class="mb-3" sec:authorize="isAuthenticated()">
+        <button class="btn btn-outline-primary me-2" 
+                th:if="${user != null}"
+                th:onclick="'toggleWatchlist(' + ${movie.id} + ')'"
+                th:classappend="${isInWatchlist} ? 'active' : ''">
+          <i class="bi bi-clock-fill"></i> Do obejrzenia
+        </button>
+        <button class="btn btn-outline-danger" 
+                th:if="${user != null}"
+                th:onclick="'toggleFavorites(' + ${movie.id} + ')'"
+                th:classappend="${isInFavorites} ? 'active' : ''">
+          <i class="bi bi-heart-fill"></i> Ulubione
+        </button>
+      </div>
       <div class="mb-3">
                     <span class="badge bg-secondary me-2"
                           th:each="genre : ${movie.genres}"
@@ -108,5 +124,69 @@
 </div>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
+
+<script th:inline="javascript">
+function toggleWatchlist(movieId) {
+    const userId = /*[[${user != null ? user.id : null}]]*/null;
+    if (!userId) {
+        window.location.href = '/auth/login';
+        return;
+    }
+    
+    const isInWatchlist = /*[[${isInWatchlist}]]*/false;
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/user/${userId}/watchlist/${movieId}`, {
+        method: isInWatchlist ? 'DELETE' : 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const button = document.querySelector(`button[onclick="toggleWatchlist(${movieId})"]`);
+        button.classList.toggle('active');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas aktualizacji listy do obejrzenia');
+    });
+}
+
+function toggleFavorites(movieId) {
+    const userId = /*[[${user != null ? user.id : null}]]*/null;
+    if (!userId) {
+        window.location.href = '/auth/login';
+        return;
+    }
+    
+    const isInFavorites = /*[[${isInFavorites}]]*/false;
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/user/${userId}/favorites/${movieId}`, {
+        method: isInFavorites ? 'DELETE' : 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const button = document.querySelector(`button[onclick="toggleFavorites(${movieId})"]`);
+        button.classList.toggle('active');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas aktualizacji ulubionych');
+    });
+}
+</script>
 </body>
 </html>

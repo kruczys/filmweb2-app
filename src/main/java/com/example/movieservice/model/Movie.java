@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -76,5 +77,18 @@ public class Movie {
         } else {
             this.averageRating = 0.0;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Movie)) return false;
+        Movie movie = (Movie) o;
+        return Objects.equals(getId(), movie.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

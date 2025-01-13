@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Moja lista do obejrzenia')}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Moja lista do obejrzenia</h2>
+    
+    <div th:if="${movies.isEmpty()}" class="alert alert-info">
+        Twoja lista do obejrzenia jest pusta.
+    </div>
+
+    <div th:if="${!movies.isEmpty()}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" th:each="movie : ${movies}">
+            <div class="card h-100">
+                <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
+                    <p class="card-text text-muted" th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a th:href="@{/movies/{id}(id=${movie.id})}" class="btn btn-primary btn-sm">Szczegóły</a>
+                        <button class="btn btn-danger btn-sm" th:onclick="'removeFromWatchlist(' + ${movie.id} + ')'">
+                            <i class="bi bi-x-lg"></i> Usuń
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+function removeFromWatchlist(movieId) {
+    if (confirm('Czy na pewno chcesz usunąć ten film z listy do obejrzenia?')) {
+        const userId = /*[[${user.id}]]*/;
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/user/${userId}/watchlist/${movieId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania filmu z listy');
+            }
+        });
+    }
+}
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html> 

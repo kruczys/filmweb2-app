@@ -3,6 +3,7 @@ package com.example.movieservice.model;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Objects;
 
 import com.example.movieservice.model.enums.Role;
 
@@ -100,5 +101,18 @@ public class User {
 
     public void setIgnoredMovies(Set<Movie> ignoredMovies) {
         this.ignoredMovies = ignoredMovies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(getId(), user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

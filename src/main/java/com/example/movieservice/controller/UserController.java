@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import java.security.Principal;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/user")
 @CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
@@ -88,5 +88,29 @@ public class UserController {
         User user = userService.findByUsername(principal.getName());
         model.addAttribute("user", user);
         return "user/profile";
+    }
+
+    @GetMapping("/watchlist")
+    public String showWatchlist(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+        
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("movies", user.getWatchList());
+        return "user/watchlist";
+    }
+
+    @GetMapping("/favorites")
+    public String showFavorites(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+        
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("movies", user.getFavoriteMovies());
+        return "user/favorites";
     }
 }
