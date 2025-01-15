@@ -141,4 +141,17 @@ public class AdminService {
     public void deleteGenre(Long genreId) {
         genreRepository.deleteById(genreId);
     }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
+    }
+
+    @Transactional
+    public User updateUser(Long id, User userUpdate) {
+        User user = getUserById(id);
+        user.setEmail(userUpdate.getEmail());
+        user.setEnabled(userUpdate.isEnabled());
+        return userRepository.save(user);
+    }
 } 

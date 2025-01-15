@@ -1,10 +1,12 @@
 package com.example.movieservice.controller;
 
 import com.example.movieservice.model.Genre;
+import com.example.movieservice.model.User;
 import com.example.movieservice.service.AdminService;
 import com.example.movieservice.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -70,5 +72,19 @@ public class AdminController {
     @ResponseBody
     public void deleteGenre(@PathVariable Long id) {
         adminService.deleteGenre(id);
+    }
+
+    @GetMapping("/users/{id}")
+    @ResponseBody
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        User user = adminService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/users/{id}")
+    @ResponseBody
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userUpdate) {
+        User updatedUser = adminService.updateUser(id, userUpdate);
+        return ResponseEntity.ok(updatedUser);
     }
 } 

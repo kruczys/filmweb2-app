@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head th:replace="~{fragments/layout :: head('Panel Administratora')}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
@@ -315,18 +317,6 @@ new Chart(ctx, {
     }
 });
 
-// Funkcje zarządzania
-function editMovie(id) {
-    fetch(`/admin/movies/${id}`)
-        .then(response => response.json())
-        .then(movie => {
-            document.getElementById('editMovieId').value = movie.id;
-            document.getElementById('editMovieTitle').value = movie.title;
-            // ... pozostałe pola
-            $('#editMovieModal').modal('show');
-        });
-}
-
 function deleteMovie(id) {
     if (confirm('Czy na pewno chcesz usunąć ten film?')) {
         const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
@@ -457,8 +447,15 @@ function saveMovie(event) {
 
 function blockUser(userId) {
     if (confirm('Czy na pewno chcesz zablokować tego użytkownika?')) {
-        fetch(`/api/admin/users/${userId}/block`, {
-            method: 'POST'
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/admin/users/${userId}/block`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
         })
         .then(response => {
             if (response.ok) {
@@ -472,8 +469,15 @@ function blockUser(userId) {
 
 function unblockUser(userId) {
     if (confirm('Czy na pewno chcesz odblokować tego użytkownika?')) {
-        fetch(`/api/admin/users/${userId}/unblock`, {
-            method: 'POST'
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/admin/users/${userId}/unblock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
         })
         .then(response => {
             if (response.ok) {
@@ -487,8 +491,15 @@ function unblockUser(userId) {
 
 function deleteReview(reviewId) {
     if (confirm('Czy na pewno chcesz usunąć tę recenzję?')) {
-        fetch(`/api/admin/reviews/${reviewId}`, {
-            method: 'DELETE'
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/admin/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
         })
         .then(response => {
             if (response.ok) {
@@ -498,6 +509,33 @@ function deleteReview(reviewId) {
             }
         });
     }
+}
+
+function editMovie(id) {
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/admin/movies/${id}`, {
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(movie => {
+        document.getElementById('editMovieId').value = movie.id;
+        document.getElementById('editMovieTitle').value = movie.title;
+        document.getElementById('editMovieDescription').value = movie.description;
+        document.getElementById('editMovieReleaseDate').value = movie.releaseDate;
+        document.getElementById('editMovieImageUrl').value = movie.imageUrl;
+        document.getElementById('editMovieTrailerUrl').value = movie.trailerUrl;
+        
+        const genreSelect = document.getElementById('editMovieGenres');
+        Array.from(genreSelect.options).forEach(option => {
+            option.selected = movie.genreIds.includes(parseInt(option.value));
+        });
+        
+        $('#editMovieModal').modal('show');
+    });
 }
 
 function updateMovie(event) {
@@ -519,7 +557,7 @@ function updateMovie(event) {
         genreIds: Array.from(form.editMovieGenres.selectedOptions).map(option => parseInt(option.value))
     };
 
-    fetch(`/api/admin/movies/${movieId}`, {
+    fetch(`/admin/movies/${movieId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -539,6 +577,66 @@ function updateMovie(event) {
     .catch(error => {
         console.error('Fetch error:', error);
         alert('Wystąpił błąd podczas aktualizacji filmu: ' + error);
+    });
+}
+
+function editUser(id) {
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/admin/users/${id}`, {
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(user => {
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editUsername').value = user.username;
+        document.getElementById('editEmail').value = user.email;
+        document.getElementById('editEnabled').value = user.enabled.toString();
+        
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas pobierania danych użytkownika');
+    });
+}
+
+function saveUserChanges() {
+    const userId = document.getElementById('editUserId').value;
+    const email = document.getElementById('editEmail').value;
+    const enabled = document.getElementById('editEnabled').value === 'true';
+    
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify({
+            id: userId,
+            email: email,
+            enabled: enabled
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+            modal.hide();
+            location.reload();
+        } else {
+            throw new Error('Network response was not ok');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas aktualizacji użytkownika');
     });
 }
 
