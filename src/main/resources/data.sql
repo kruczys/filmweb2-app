@@ -34,12 +34,12 @@ INSERT INTO cast_members (first_name, last_name, date_of_birth, biography, image
 
 -- Dodanie filmów
 INSERT INTO movies (title, description, release_date, created_at, view_count, image_url, trailer_url) VALUES
-('Incepcja', 'Film o złodziejach snów i zagłębianiu się w podświadomość', '2010-07-16', CURRENT_TIMESTAMP, 1500, 'https://example.com/inception.jpg', 'https://youtube.com/watch?v=inception'),
-('Matrix', 'Kultowy film o wirtualnej rzeczywistości', '1999-03-31', CURRENT_TIMESTAMP, 2000, 'https://example.com/matrix.jpg', 'https://youtube.com/watch?v=matrix'),
-('Władca Pierścieni', 'Epicka opowieść o wyprawie do Mordoru', '2001-12-19', CURRENT_TIMESTAMP, 2500, 'https://example.com/lotr.jpg', 'https://youtube.com/watch?v=lotr'),
-('Pulp Fiction', 'Kultowy film Quentina Tarantino', '1994-10-14', CURRENT_TIMESTAMP, 1800, 'https://example.com/pulp-fiction.jpg', 'https://youtube.com/watch?v=pulp-fiction'),
-('Avengers', 'Superprodukcja o grupie superbohaterów', '2012-04-11', CURRENT_TIMESTAMP, 3000, 'https://example.com/avengers.jpg', 'https://youtube.com/watch?v=avengers'),
-('Interstellar', 'Kosmiczna podróż w poszukiwaniu nowego domu', '2014-11-07', CURRENT_TIMESTAMP, 1700, 'https://example.com/interstellar.jpg', 'https://youtube.com/watch?v=interstellar');
+('Incepcja', 'Film o złodziejach snów i zagłębianiu się w podświadomość', '2010-07-16', CURRENT_TIMESTAMP, 1500, 'https://m.media-amazon.com/images/I/714b1KQmskL._AC_SL1280_.jpg', 'https://youtube.com/watch?v=inception'),
+('Matrix', 'Kultowy film o wirtualnej rzeczywistości', '1999-03-31', CURRENT_TIMESTAMP, 2000, 'https://storage.googleapis.com/pod_public/1300/105082.jpg', 'https://youtube.com/watch?v=matrix'),
+('Władca Pierścieni', 'Epicka opowieść o wyprawie do Mordoru', '2001-12-19', CURRENT_TIMESTAMP, 2500, 'https://images.squarespace-cdn.com/content/v1/606dc96785a0fa58fdbc57fe/b3d10633-9889-42ca-83e6-ee0fa3335a98/LOTR+-+Fellowship+-+REG+LQ.jpg', 'https://youtube.com/watch?v=lotr'),
+('Pulp Fiction', 'Kultowy film Quentina Tarantino', '1994-10-14', CURRENT_TIMESTAMP, 1800, 'https://i.etsystatic.com/35704812/r/il/d1ee54/4228922390/il_794xN.4228922390_3pbr.jpg', 'https://youtube.com/watch?v=pulp-fiction'),
+('Avengers', 'Superprodukcja o grupie superbohaterów', '2012-04-11', CURRENT_TIMESTAMP, 3000, 'https://4rooms.com.pl/environment/cache/images/600_600_productGfx_14854/Avegers-w-ramcee.jpg', 'https://youtube.com/watch?v=avengers'),
+('Interstellar', 'Kosmiczna podróż w poszukiwaniu nowego domu', '2014-11-07', CURRENT_TIMESTAMP, 1700, 'https://static.printler.com/cache/5/5/0/a/5/6/550a5621331cc45d676ec5053203e2e5ec27ef76.jpg', 'https://youtube.com/watch?v=interstellar');
 
 -- Powiązanie filmów z gatunkami
 INSERT INTO movies_genres (movies_id, genres_id) 
