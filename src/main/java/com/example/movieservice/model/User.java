@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.example.movieservice.model.enums.Role;
 
@@ -21,6 +23,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
 
 @Data
 @Entity
@@ -53,7 +58,13 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @JsonBackReference
     @ManyToMany
+    @JoinTable(
+        name = "user_favorites",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "movie_id")
+    )
     private Set<Movie> favoriteMovies = new HashSet<>();
 
     @ManyToMany
@@ -63,7 +74,7 @@ public class User {
     private Set<Movie> ignoredMovies = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<Review> reviews = new HashSet<>();
+    private List<Review> reviews = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

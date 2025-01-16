@@ -17,6 +17,10 @@ public class CastMemberService {
         this.castMemberRepository = castMemberRepository;
     }
 
+    public List<CastMember> getAllCastMembers() {
+        return castMemberRepository.findAll();
+    }
+
     public CastMember getCastMemberById(Long id) {
         return castMemberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cast member not found with id: " + id));

@@ -47,8 +47,9 @@
   <div th:if="${!movies.content.isEmpty()}" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     <div class="col" th:each="movie : ${movies}">
       <div class="card h-100">
-        <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}"
-             class="card-img-top" alt="Movie poster">
+        <a th:href="@{/movies/{id}(id=${movie.id})}">
+          <img th:if="${movie.imageUrl}" th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        </a>
         <div class="card-body">
           <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
           <p class="card-text text-muted"
@@ -63,9 +64,9 @@
                class="btn btn-primary">Szczegóły</a>
             <small class="text-muted">
               <i class="bi bi-star-fill text-warning"></i>
-              <span th:text="${movie.averageRating > 0 ?
-                                               #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
-                                               'Brak ocen'}">
+              <span th:text="${movie.averageRating != null && movie.averageRating > 0 ? 
+                           #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' : 
+                           'Brak ocen'}">
               </span>
             </small>
           </div>

@@ -39,6 +39,11 @@
                             <i class="bi bi-tags"></i> Gatunki
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#cast">
+                            <i class="bi bi-cast"></i> Obsada
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -131,7 +136,7 @@
                                         01.01.2024
                                     </td>
                                     <td>
-                                        <span th:text="${movie.averageRating}">4.5</span>/5
+                                        <span th:text="${movie.averageRating != null ? movie.averageRating + '/5' : 'Brak oceny'}">4.5/5</span>
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-warning" 
@@ -223,7 +228,9 @@
                                     <td th:text="${review.id}">1</td>
                                     <td th:text="${review.movie.title}">Tytuł filmu</td>
                                     <td th:text="${review.user.username}">Użytkownik</td>
-                                    <td th:text="${review.rating}">5</td>
+                                    <td>
+                                        <span th:text="${review.rating != null ? review.rating + '/5' : 'Brak oceny'}">5/5</span>
+                                    </td>
                                     <td th:text="${review.content}">Treść recenzji</td>
                                     <td th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</td>
                                     <td>
@@ -266,6 +273,51 @@
                                     <td>
                                         <button class="btn btn-sm btn-danger" 
                                                 th:onclick="'deleteGenre(' + ${genre.id} + ')'">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Zarządzanie obsadą -->
+                <div class="tab-pane fade" id="cast">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1>Zarządzanie obsadą</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                                    data-bs-target="#addCastMemberModal">
+                                <i class="bi bi-plus"></i> Dodaj członka obsady
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Imię i nazwisko</th>
+                                    <th>Data urodzenia</th>
+                                    <th>Liczba filmów</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="castMember : ${castMembers}">
+                                    <td th:text="${castMember.id}">1</td>
+                                    <td th:text="${castMember.firstName + ' ' + castMember.lastName}">John Doe</td>
+                                    <td th:text="${#temporals.format(castMember.dateOfBirth, 'dd.MM.yyyy')}">01.01.1970</td>
+                                    <td th:text="${castMember.movies.size()}">0</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" 
+                                                th:onclick="'editCastMember(' + ${castMember.id} + ')'">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" 
+                                                th:onclick="'deleteCastMember(' + ${castMember.id} + ')'">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -402,7 +454,8 @@ function saveMovie(event) {
     const imageUrl = form.imageUrl.value;
     const trailerUrl = form.trailerUrl.value;
     const genres = form.genres;
-
+    const cast = form.cast;
+    
     if (!title || !description || !releaseDate) {
         alert('Wypełnij wszystkie wymagane pola');
         return;
@@ -412,13 +465,18 @@ function saveMovie(event) {
         .filter(option => option.selected)
         .map(option => parseInt(option.value));
 
+    const selectedCast = Array.from(cast.options)
+        .filter(option => option.selected)
+        .map(option => parseInt(option.value));
+
     const movie = {
         title,
         description,
         releaseDate,
         imageUrl,
         trailerUrl,
-        genreIds: selectedGenres
+        genreIds: selectedGenres,
+        castMemberIds: selectedCast
     };
 
     fetch('/admin/movies/add', {
@@ -533,6 +591,13 @@ function editMovie(id) {
         Array.from(genreSelect.options).forEach(option => {
             option.selected = movie.genreIds.includes(parseInt(option.value));
         });
+
+        const castSelect = document.getElementById('editMovieCast');
+        if (castSelect) {
+            Array.from(castSelect.options).forEach(option => {
+                option.selected = (movie.castMemberIds || []).includes(parseInt(option.value));
+            });
+        }
         
         $('#editMovieModal').modal('show');
     });
@@ -554,7 +619,8 @@ function updateMovie(event) {
         releaseDate: form.editMovieReleaseDate.value,
         imageUrl: form.editMovieImageUrl.value,
         trailerUrl: form.editMovieTrailerUrl.value,
-        genreIds: Array.from(form.editMovieGenres.selectedOptions).map(option => parseInt(option.value))
+        genreIds: Array.from(form.editMovieGenres.selectedOptions).map(option => parseInt(option.value)),
+        castMemberIds: Array.from(form.editMovieCast.selectedOptions).map(option => parseInt(option.value))
     };
 
     fetch(`/admin/movies/${movieId}`, {
@@ -640,7 +706,64 @@ function saveUserChanges() {
     });
 }
 
-// Podobne funkcje dla użytkowników i innych encji
+function saveCastMember() {
+    const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    
+    const form = document.getElementById('addCastMemberForm');
+    const castMember = {
+        firstName: form.querySelector('#firstName').value,
+        lastName: form.querySelector('#lastName').value,
+        dateOfBirth: form.querySelector('#dateOfBirth').value,
+        biography: form.querySelector('#biography').value,
+        imageUrl: form.querySelector('#imageUrl').value
+    };
+
+    fetch('/api/admin/cast-members', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [header]: token
+        },
+        body: JSON.stringify(castMember)
+    })
+    .then(response => {
+        if (response.ok) {
+            document.getElementById('addCastMemberModal').querySelector('.btn-close').click();
+            location.reload();
+        } else {
+            throw new Error('Failed to save cast member');
+        }
+    })
+    .catch(error => {
+        alert('Wystąpił błąd podczas dodawania członka obsady: ' + error);
+    });
+}
+
+function deleteCastMember(id) {
+    if (confirm('Czy na pewno chcesz usunąć tego członka obsady?')) {
+        const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        
+        fetch(`/api/admin/cast-members/${id}`, {
+            method: 'DELETE',
+            headers: {
+                [header]: token
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                throw new Error('Failed to delete cast member');
+            }
+        })
+        .catch(error => {
+            alert('Wystąpił błąd podczas usuwania członka obsady: ' + error);
+        });
+    }
+}
+
 </script>
 </body>
 </html> 

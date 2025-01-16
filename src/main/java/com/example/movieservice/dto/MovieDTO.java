@@ -2,6 +2,12 @@ package com.example.movieservice.dto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+
+import com.example.movieservice.model.Review;
+
+import java.util.HashSet;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +23,7 @@ public class MovieDTO {
     private LocalDate releaseDate;
     private String imageUrl;
     private String trailerUrl;
-    private List<Long> genreIds;
+    private List<Long> genreIds = new ArrayList<>();
+    private List<Long> castMemberIds = new ArrayList<>();
     private Double averageRating;
 } 

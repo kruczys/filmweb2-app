@@ -44,8 +44,8 @@
       <div class="mb-3">
         <h5>Obsada:</h5>
         <span th:each="actor : ${movie.cast}" class="me-3">
-                        <span th:text="${actor.firstName}">Aktor</span>
-                    </span>
+            <span th:text="${actor.firstName + ' ' + actor.lastName}">Aktor</span>
+        </span>
       </div>
 
       <div class="mb-3">
@@ -57,10 +57,15 @@
         <p>
           <strong>Średnia ocena:</strong>
           <i class="bi bi-star-fill text-warning"></i>
-          <span th:text="${movie.averageRating > 0 ?
-                                     #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' :
-                                     'Brak ocen'}">4.5/5.0</span>
-          <span th:text="'(' + ${#lists.size(movie.reviews)} + ' recenzji)'"></span>
+          <span th:text="${movie.averageRating != null && movie.averageRating > 0 ? 
+                        #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' : 
+                        'Brak ocen'}">4.5/5.0</span>
+          <span th:if="${movie.reviews != null && !movie.reviews.isEmpty()}"
+                th:with="reviewCount=${#lists.size(movie.reviews)}"
+                th:text="${'(' + reviewCount + ' ' + 
+                         (reviewCount == 1 ? 'recenzja' : 
+                         (reviewCount < 5 ? 'recenzje' : 'recenzji')) + ')'}">
+          </span>
         </p>
       </div>
 

@@ -3,6 +3,7 @@ package com.example.movieservice.controller;
 import com.example.movieservice.model.Genre;
 import com.example.movieservice.model.User;
 import com.example.movieservice.service.AdminService;
+import com.example.movieservice.service.CastMemberService;
 import com.example.movieservice.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,8 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
     private final GenreService genreService;
-
+    private final CastMemberService castMemberService;
+    
     @GetMapping
     public String dashboard(Model model, Pageable pageable) {
         model.addAttribute("stats", adminService.getDashboardStats());
@@ -29,6 +31,7 @@ public class AdminController {
         model.addAttribute("users", adminService.getUsers(pageable));
         model.addAttribute("reviews", adminService.getReviews(pageable));
         model.addAttribute("genres", genreService.getAllGenres());
+        model.addAttribute("castMembers", castMemberService.getAllCastMembers());
         return "admin/dashboard";
     }
 

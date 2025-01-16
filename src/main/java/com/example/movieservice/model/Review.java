@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.HashSet;
 
 @Data
@@ -24,6 +27,7 @@ public class Review {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;

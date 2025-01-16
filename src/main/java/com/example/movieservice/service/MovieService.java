@@ -1,6 +1,7 @@
 package com.example.movieservice.service;
 
 import com.example.movieservice.dto.MovieDTO;
+import com.example.movieservice.model.CastMember;
 import com.example.movieservice.model.Genre;
 import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.Review;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -72,6 +74,14 @@ public class MovieService {
             movie.setGenres(genres);
         }
 
+        if (movieDTO.getCastMemberIds() != null && !movieDTO.getCastMemberIds().isEmpty()) {
+            Set<CastMember> castMembers = movieDTO.getCastMemberIds().stream()
+                .map(castMemberId -> castMemberRepository.findById(castMemberId)
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono członka obsady o ID: " + castMemberId)))
+                .collect(Collectors.toSet());
+            movie.setCast(castMembers);
+        }
+
         Movie savedMovie = movieRepository.save(movie);
         return convertToDTO(savedMovie);
     }
@@ -84,22 +94,32 @@ public class MovieService {
         dto.setReleaseDate(movie.getReleaseDate());
         dto.setImageUrl(movie.getImageUrl());
         dto.setTrailerUrl(movie.getTrailerUrl());
-        dto.setGenreIds(movie.getGenres().stream()
-            .map(Genre::getId)
-            .collect(Collectors.toList()));
-        dto.setAverageRating(calculateAverageRating(movie));
+        dto.setAverageRating(movie.getAverageRating());
+        
+        if (movie.getGenres() != null) {
+            dto.setGenreIds(movie.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList()));
+        }
+        
+        if (movie.getCast() != null) {
+            dto.setCastMemberIds(movie.getCast().stream()
+                .map(CastMember::getId)
+                .collect(Collectors.toList()));
+        }
+        
         return dto;
     }
 
-    private Double calculateAverageRating(Movie movie) {
-        if (movie.getReviews() == null || movie.getReviews().isEmpty()) {
-            return 0.0;
-        }
-        return movie.getReviews().stream()
-            .mapToDouble(Review::getRating)
-            .average()
-            .orElse(0.0);
-    }
+    // private Double calculateAverageRating(Movie movie) {
+    //     if (movie.getReviews() == null || movie.getReviews().isEmpty()) {
+    //         return 0.0;
+    //     }
+    //     return movie.getReviews().stream()
+    //         .mapToDouble(Review::getRating)
+    //         .average()
+    //         .orElse(0.0);
+    // }
 
     public Movie updateMovie(Long id, Movie movieDetails) {
         Movie movie = movieRepository.findById(id)
@@ -139,6 +159,14 @@ public class MovieService {
                     .orElseThrow(() -> new RuntimeException("Nie znaleziono gatunku o ID: " + genreId)))
                 .collect(Collectors.toSet());
             movie.setGenres(genres);
+        }
+
+        if (movieDTO.getCastMemberIds() != null && !movieDTO.getCastMemberIds().isEmpty()) {
+            Set<CastMember> castMembers = movieDTO.getCastMemberIds().stream()
+                .map(castMemberId -> castMemberRepository.findById(castMemberId)
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono członka obsady o ID: " + castMemberId)))
+                .collect(Collectors.toSet());
+            movie.setCast(castMembers);
         }
 
         Movie updatedMovie = movieRepository.save(movie);

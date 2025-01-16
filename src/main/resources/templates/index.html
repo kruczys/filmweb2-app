@@ -23,10 +23,21 @@
   <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
     <div class="col" th:each="movie : ${latestMovies}">
       <div class="card h-100">
-        <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        <a th:href="@{/movies/{id}(id=${movie.id})}">
+          <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        </a>
         <div class="card-body">
           <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
-          <p class="card-text text-muted" th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <p class="card-text text-muted mb-0" th:text="${#temporals.format(movie.releaseDate, 'yyyy')}">2024</p>
+            <small class="text-muted">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span th:text="${movie.averageRating != null && movie.averageRating > 0 ? 
+                           #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' : 
+                           'Brak ocen'}">
+              </span>
+            </small>
+          </div>
         </div>
       </div>
     </div>
@@ -37,13 +48,24 @@
   <div class="row row-cols-1 row-cols-md-5 g-4">
     <div class="col" th:each="movie : ${popularMovies}">
       <div class="card h-100">
-        <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        <a th:href="@{/movies/{id}(id=${movie.id})}">
+          <img th:src="${movie.imageUrl}" class="card-img-top" alt="Movie poster">
+        </a>
         <div class="card-body">
           <h5 class="card-title" th:text="${movie.title}">Movie title</h5>
-          <p class="card-text">
-            <i class="bi bi-people-fill text-primary"></i>
-            <span th:text="${movie.reviews.size()}">0</span> recenzji
-          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            <p class="card-text mb-0">
+              <i class="bi bi-people-fill text-primary"></i>
+              <span th:text="${movie.reviews.size()}">0</span> recenzji
+            </p>
+            <small class="text-muted">
+              <i class="bi bi-star-fill text-warning"></i>
+              <span th:text="${movie.averageRating != null && movie.averageRating > 0 ? 
+                           #numbers.formatDecimal(movie.averageRating, 1, 1) + '/5.0' : 
+                           'Brak ocen'}">
+              </span>
+            </small>
+          </div>
         </div>
       </div>
     </div>

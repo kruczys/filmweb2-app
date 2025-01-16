@@ -7,10 +7,15 @@ import java.util.Set;
 import java.util.HashSet;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Entity
 @Table(name = "movies")
+@JsonIgnoreProperties({"reviews", "favoritedBy"})
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,18 +46,20 @@ public class Movie {
 
     @ManyToMany
     @JoinTable(
-            name = "movies_genres",
-            joinColumns = @JoinColumn(name = "movies_id"),
-            inverseJoinColumns = @JoinColumn(name = "genres_id")
+            name = "movie_genre",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private Set<Genre> genres = new HashSet<>();
 
     private String imageUrl;
     private String trailerUrl;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    private Set<Review> reviews = new HashSet<>();
+    private List<Review> reviews = new ArrayList<>();
 
+    @JsonManagedReference
     @ManyToMany(mappedBy = "favoriteMovies")
     private Set<User> favoritedBy = new HashSet<>();
 
@@ -69,14 +76,28 @@ public class Movie {
     }
 
     public void updateAverageRating() {
-        if (reviews != null && !reviews.isEmpty()) {
-            this.averageRating = reviews.stream()
-                    .mapToDouble(Review::getRating)
-                    .average()
-                    .orElse(0.0);
-        } else {
+        if (this.reviews == null || this.reviews.isEmpty()) {
             this.averageRating = 0.0;
+            return;
         }
+
+        double sum = this.reviews.stream()
+            .filter(review -> review.isModerated())
+            .mapToDouble(Review::getRating)
+            .sum();
+
+        long count = this.reviews.stream()
+            .filter(review -> review.isModerated())
+            .count();
+
+        this.averageRating = count > 0 ? sum / count : 0.0;
+    }
+
+    public Double getAverageRating() {
+        if (this.averageRating == null) {
+            updateAverageRating();
+        }
+        return this.averageRating;
     }
 
     @Override

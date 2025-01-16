@@ -42,27 +42,27 @@ INSERT INTO movies (title, description, release_date, created_at, view_count, im
 ('Interstellar', 'Kosmiczna podróż w poszukiwaniu nowego domu', '2014-11-07', CURRENT_TIMESTAMP, 1700, 'https://static.printler.com/cache/5/5/0/a/5/6/550a5621331cc45d676ec5053203e2e5ec27ef76.jpg', 'https://youtube.com/watch?v=interstellar');
 
 -- Powiązanie filmów z gatunkami
-INSERT INTO movies_genres (movies_id, genres_id) 
+INSERT INTO movie_genre (movie_id, genre_id) 
 SELECT m.id, g.id FROM movies m, genres g 
 WHERE m.title = 'Incepcja' AND g.name IN ('Akcja', 'Sci-Fi', 'Thriller');
 
-INSERT INTO movies_genres (movies_id, genres_id)
+INSERT INTO movie_genre (movie_id, genre_id)
 SELECT m.id, g.id FROM movies m, genres g
 WHERE m.title = 'Matrix' AND g.name IN ('Akcja', 'Sci-Fi');
 
-INSERT INTO movies_genres (movies_id, genres_id)
+INSERT INTO movie_genre (movie_id, genre_id)
 SELECT m.id, g.id FROM movies m, genres g
 WHERE m.title = 'Władca Pierścieni' AND g.name IN ('Fantasy', 'Przygodowy', 'Akcja');
 
-INSERT INTO movies_genres (movies_id, genres_id)
+INSERT INTO movie_genre (movie_id, genre_id)
 SELECT m.id, g.id FROM movies m, genres g
 WHERE m.title = 'Pulp Fiction' AND g.name IN ('Dramat', 'Thriller');
 
-INSERT INTO movies_genres (movies_id, genres_id)
+INSERT INTO movie_genre (movie_id, genre_id)
 SELECT m.id, g.id FROM movies m, genres g
 WHERE m.title = 'Avengers' AND g.name IN ('Akcja', 'Sci-Fi', 'Przygodowy');
 
-INSERT INTO movies_genres (movies_id, genres_id)
+INSERT INTO movie_genre (movie_id, genre_id)
 SELECT m.id, g.id FROM movies m, genres g
 WHERE m.title = 'Interstellar' AND g.name IN ('Sci-Fi', 'Dramat', 'Przygodowy');
 
