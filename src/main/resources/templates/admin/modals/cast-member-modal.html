@@ -44,5 +44,46 @@
         </div>
     </div>
 </div>
+
+<!-- Modal edycji członka obsady -->
+<div th:fragment="editCastMemberModal" class="modal fade" id="editCastMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edytuj członka obsady</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCastMemberForm">
+                    <input type="hidden" id="editCastMemberId">
+                    <div class="mb-3">
+                        <label for="editFirstName" class="form-label">Imię</label>
+                        <input type="text" class="form-control" id="editFirstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLastName" class="form-label">Nazwisko</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDateOfBirth" class="form-label">Data urodzenia</label>
+                        <input type="date" class="form-control" id="editDateOfBirth">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editBiography" class="form-label">Biografia</label>
+                        <textarea class="form-control" id="editBiography" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editImageUrl" class="form-label">URL zdjęcia</label>
+                        <input type="url" class="form-control" id="editImageUrl">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <button type="button" class="btn btn-primary" onclick="updateCastMember()">Zapisz zmiany</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html> 

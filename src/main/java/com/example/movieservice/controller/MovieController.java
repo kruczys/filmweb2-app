@@ -75,6 +75,7 @@ public class MovieController {
         model.addAttribute("title", title);
         model.addAttribute("genre", genre);
         model.addAttribute("castMember", castMember);
+        model.addAttribute("param.title", title);
         return "movies/search-results";
     }
 

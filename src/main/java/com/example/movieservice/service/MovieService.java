@@ -52,8 +52,11 @@ public class MovieService {
     }
 
     public Page<Movie> searchMovies(String title, String genre, String castMember, Pageable pageable) {
-        if (title != null && !title.isEmpty()) {
-            return movieRepository.findByTitleContainingIgnoreCase(title, pageable);
+        if (title != null && !title.isEmpty() || 
+            genre != null && !genre.isEmpty() || 
+            castMember != null && !castMember.isEmpty()) {
+            
+            return movieRepository.findBySearchCriteria(title, genre, castMember, pageable);
         }
         return movieRepository.findAll(pageable);
     }

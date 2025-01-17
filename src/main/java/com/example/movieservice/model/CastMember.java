@@ -16,15 +16,17 @@ public class CastMember {
     private Long id;
 
     @NotBlank
+    @Column(columnDefinition = "text")
     private String firstName;
 
     @NotBlank
+    @Column(columnDefinition = "text")
     private String lastName;
 
     @Column(name = "date_of_birth")
     private LocalDateTime dateOfBirth;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String biography;
 
     @Column(name = "image_url")

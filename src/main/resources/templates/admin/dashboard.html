@@ -336,6 +336,7 @@
 <div th:replace="~{admin/modals/movie-modal :: editMovieModal}"></div>
 <div th:replace="~{admin/modals/user-modal :: editUserModal}"></div>
 <div th:replace="~{admin/modals/genre-modal :: addGenreModal}"></div>
+<div th:replace="~{admin/modals/cast-member-modal :: editCastMemberModal}"></div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -764,6 +765,75 @@ function deleteCastMember(id) {
     }
 }
 
+function editCastMember(id) {
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    fetch(`/api/admin/cast-members/${id}`, {
+        headers: {
+            [csrfHeader]: csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(castMember => {
+        document.getElementById('editCastMemberId').value = castMember.id;
+        document.getElementById('editFirstName').value = castMember.firstName;
+        document.getElementById('editLastName').value = castMember.lastName;
+        document.getElementById('editDateOfBirth').value = castMember.dateOfBirth;
+        document.getElementById('editBiography').value = castMember.biography || '';
+        document.getElementById('editImageUrl').value = castMember.imageUrl || '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('editCastMemberModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas pobierania danych członka obsady');
+    });
+}
+
+function updateCastMember() {
+    const id = document.getElementById('editCastMemberId').value;
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    const dateOfBirth = document.getElementById('editDateOfBirth').value;
+    const formattedDate = dateOfBirth ? dateOfBirth + 'T00:00:00.000Z' : null;
+    
+    const castMember = {
+        id: parseInt(id),
+        firstName: document.getElementById('editFirstName').value,
+        lastName: document.getElementById('editLastName').value,
+        dateOfBirth: formattedDate,
+        biography: document.getElementById('editBiography').value || '',
+        imageUrl: document.getElementById('editImageUrl').value || ''
+    };
+
+    fetch(`/api/admin/cast-members/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(castMember)
+    })
+    .then(async response => {
+        const contentType = response.headers.get('content-type');
+        if (!response.ok) {
+            const errorData = contentType && contentType.includes('application/json') 
+                ? await response.json()
+                : await response.text();
+            throw new Error(typeof errorData === 'string' ? errorData : JSON.stringify(errorData));
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editCastMemberModal'));
+        modal.hide();
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Wystąpił błąd podczas aktualizacji członka obsady: ' + error.message);
+    });
+}
 </script>
 </body>
 </html> 
