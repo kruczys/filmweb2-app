@@ -3,6 +3,7 @@
 <head th:replace="~{fragments/layout :: head('Profil użytkownika')}">
 </head>
 <body>
+<div th:replace="~{user/modals/edit-profile-modal :: editProfileModal}"></div>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <div class="container mt-4">
@@ -105,5 +106,60 @@
 </div>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
+<script th:inline="javascript">
+function updateProfile() {
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    
+    const userId = /*[[${user.id}]]*/0;
+    const email = document.getElementById('editEmail').value;
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (newPassword && newPassword !== confirmPassword) {
+        alert('Nowe hasła nie są takie same');
+        return;
+    }
+
+    const userData = {
+        email: email,
+        currentPassword: currentPassword,
+        newPassword: newPassword || null
+    };
+
+    fetch(`/user/profile/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify(userData)
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(errorData);
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+        modal.hide();
+        location.reload();
+    })
+    .catch(error => {
+        alert('Wystąpił błąd podczas aktualizacji profilu: ' + error.message);
+    });
+}
+
+// Initialize modal properly
+document.addEventListener('DOMContentLoaded', function() {
+    const editProfileButton = document.querySelector('[data-bs-target="#editProfileModal"]');
+    if (editProfileButton) {
+        editProfileButton.addEventListener('click', function() {
+            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+            modal.show();
+        });
+    }
+});
+</script>
 </body>
 </html> 

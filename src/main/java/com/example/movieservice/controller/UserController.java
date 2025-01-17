@@ -1,5 +1,6 @@
 package com.example.movieservice.controller;
 
+import com.example.movieservice.dto.UserProfileUpdateDTO;
 import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
 import com.example.movieservice.service.MovieService;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import java.security.Principal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 @RequestMapping("/user")
@@ -112,5 +115,38 @@ public class UserController {
         model.addAttribute("user", user);
         model.addAttribute("movies", user.getFavoriteMovies());
         return "user/favorites";
+    }
+
+    @PutMapping("/profile/update")
+    public ResponseEntity<?> updateProfile(@RequestBody UserUpdateRequest userUpdate, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        
+        User userDetails = new User();
+        userDetails.setEmail(userUpdate.getEmail());
+        if (userUpdate.getNewPassword() != null && !userUpdate.getNewPassword().isEmpty()) {
+            userDetails.setPassword(userUpdate.getNewPassword());
+        }
+        
+        try {
+            userService.updateUser(user.getId(), userDetails);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // DTO for profile update
+    public static class UserUpdateRequest {
+        private String email;
+        private String currentPassword;
+        private String newPassword;
+        
+        // Getters and setters
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getCurrentPassword() { return currentPassword; }
+        public void setCurrentPassword(String currentPassword) { this.currentPassword = currentPassword; }
+        public String getNewPassword() { return newPassword; }
+        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
     }
 }
