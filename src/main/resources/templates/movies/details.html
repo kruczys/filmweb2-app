@@ -3,6 +3,26 @@
 <head th:replace="~{fragments/layout :: head('Szczegóły filmu')}">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        .rating .btn-group {
+            gap: 5px;
+        }
+        .rating .btn {
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .rating .btn-check:checked + .btn-outline-warning,
+        .rating .btn-outline-warning.active {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .rating .btn-outline-warning:hover {
+            background-color: #fff3cd;
+        }
+    </style>
 </head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
@@ -83,8 +103,13 @@
   <!-- Sekcja recenzji -->
   <div class="mt-5">
     <h2>Recenzje</h2>
-    <div class="mb-4">
-      <a href="#" class="btn btn-primary">Dodaj recenzję</a>
+    <div class="mb-4" sec:authorize="isAuthenticated()">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+            Dodaj recenzję
+        </button>
+    </div>
+    <div class="mb-4" sec:authorize="!isAuthenticated()">
+        <a href="/auth/login" class="btn btn-primary">Zaloguj się, aby dodać recenzję</a>
     </div>
 
     <!-- Lista recenzji -->
@@ -126,6 +151,51 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal dodawania recenzji -->
+<div class="modal fade" id="addReviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dodaj recenzję</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <div class="mb-3">
+                        <label class="form-label">Ocena</label>
+                        <div class="rating">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="rating" id="rating1" value="1" required>
+                                <label class="btn btn-outline-warning" for="rating1" onclick="handleRatingClick(1)">1</label>
+                                
+                                <input type="radio" class="btn-check" name="rating" id="rating2" value="2">
+                                <label class="btn btn-outline-warning" for="rating2" onclick="handleRatingClick(2)">2</label>
+                                
+                                <input type="radio" class="btn-check" name="rating" id="rating3" value="3">
+                                <label class="btn btn-outline-warning" for="rating3" onclick="handleRatingClick(3)">3</label>
+                                
+                                <input type="radio" class="btn-check" name="rating" id="rating4" value="4">
+                                <label class="btn btn-outline-warning" for="rating4" onclick="handleRatingClick(4)">4</label>
+                                
+                                <input type="radio" class="btn-check" name="rating" id="rating5" value="5">
+                                <label class="btn btn-outline-warning" for="rating5" onclick="handleRatingClick(5)">5</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewContent" class="form-label">Treść recenzji</label>
+                        <textarea class="form-control" id="reviewContent" rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">Dodaj recenzję</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
@@ -190,6 +260,66 @@ function toggleFavorites(movieId) {
     .catch(error => {
         console.error('Error:', error);
         alert('Wystąpił błąd podczas aktualizacji ulubionych');
+    });
+}
+
+function submitReview() {
+    const rating = document.querySelector('input[name="rating"]:checked')?.value;
+    const content = document.getElementById('reviewContent').value;
+    
+    if (!rating || !content) {
+        alert('Proszę wypełnić wszystkie pola');
+        return;
+    }
+
+    const movieId = /*[[${movie.id}]]*/0;
+    const userId = /*[[${user != null ? user.id : null}]]*/null;
+    
+    if (!userId) {
+        window.location.href = '/auth/login';
+        return;
+    }
+
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+
+    fetch(`/reviews/movie/${movieId}/user/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+        },
+        body: JSON.stringify({
+            rating: parseInt(rating),
+            content: content
+        })
+    })
+    .then(async response => {
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Wystąpił błąd podczas dodawania recenzji');
+        }
+        const modal = document.getElementById('addReviewModal');
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        bootstrapModal.hide();
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+    });
+}
+
+function handleRatingClick(rating) {
+    const ratings = document.querySelectorAll('input[name="rating"]');
+    ratings.forEach(input => {
+        if (parseInt(input.value) <= rating) {
+            input.checked = true;
+            input.nextElementSibling.classList.add('active');
+        } else {
+            input.checked = false;
+            input.nextElementSibling.classList.remove('active');
+        }
     });
 }
 </script>
