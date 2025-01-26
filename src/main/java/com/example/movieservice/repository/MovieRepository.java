@@ -58,14 +58,16 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query(value = "SELECT m.* FROM movies m LEFT JOIN " +
            "(SELECT movie_id, AVG(rating) as avg_rating FROM reviews WHERE moderated = true GROUP BY movie_id) r " +
            "ON m.id = r.movie_id " +
-           "ORDER BY COALESCE(r.avg_rating, 0) DESC", 
+           "ORDER BY CASE WHEN r.avg_rating IS NULL OR r.avg_rating = 0 THEN 2 ELSE 1 END, " +
+           "r.avg_rating DESC", 
            nativeQuery = true)
     Page<Movie> findAllByOrderByAverageRatingDesc(Pageable pageable);
 
     @Query(value = "SELECT m.* FROM movies m LEFT JOIN " +
            "(SELECT movie_id, AVG(rating) as avg_rating FROM reviews WHERE moderated = true GROUP BY movie_id) r " +
            "ON m.id = r.movie_id " +
-           "ORDER BY COALESCE(r.avg_rating, 0) ASC", 
+           "ORDER BY CASE WHEN r.avg_rating IS NULL OR r.avg_rating = 0 THEN 2 ELSE 1 END, " +
+           "r.avg_rating ASC", 
            nativeQuery = true)
     Page<Movie> findAllByOrderByAverageRatingAsc(Pageable pageable);
 
