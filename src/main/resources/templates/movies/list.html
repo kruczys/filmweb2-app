@@ -16,10 +16,16 @@
       </form>
     </div>
     <div class="col-md-4">
-      <select class="form-select" onchange="updateSort(this.value)">
-        <option th:selected="${sortBy == 'releaseDate'}" value="releaseDate">Najnowsze</option>
-        <option th:selected="${sortBy == 'title'}" value="title">Tytuł A-Z</option>
-      </select>
+      <div class="mb-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+          <select class="form-select" id="sortSelect" onchange="applyFilters()">
+            <option value="releaseDate,desc">Najnowsze</option>
+            <option value="releaseDate,asc">Najstarsze</option>
+            <option value="averageRating,desc">Najwyżej oceniane</option>
+            <option value="averageRating,asc">Najniżej oceniane</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -86,12 +92,22 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 
-<script>
-  function updateSort(value) {
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('sortBy', value);
-    window.location.href = currentUrl.toString();
-  }
+<script th:inline="javascript">
+function applyFilters() {
+    const sortBy = document.getElementById('sortSelect').value;
+    let url = new URL(window.location.href);
+    const [sort, direction] = sortBy.split(',');
+    url.searchParams.set('sort', sort);
+    url.searchParams.set('direction', direction);
+    window.location.href = url.toString();
+}
+
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sort = urlParams.get('sort') || 'releaseDate';
+    const direction = urlParams.get('direction') || 'desc';
+    document.getElementById('sortSelect').value = `${sort},${direction}`;
+}
 </script>
 </body>
 </html>

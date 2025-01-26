@@ -66,8 +66,8 @@ public class Movie {
     @ManyToMany(mappedBy = "watchList")
     private Set<User> inWatchlistOf = new HashSet<>();
 
-    @Column(name = "average_rating")
-    private Double averageRating = 0.0;
+    @Column(nullable = true)
+    private Double averageRating;
 
     @PrePersist
     protected void onCreate() {
@@ -82,12 +82,12 @@ public class Movie {
         }
 
         double sum = this.reviews.stream()
-            .filter(review -> review.isModerated())
+            .filter(Review::isModerated)
             .mapToDouble(Review::getRating)
             .sum();
 
         long count = this.reviews.stream()
-            .filter(review -> review.isModerated())
+            .filter(Review::isModerated)
             .count();
 
         this.averageRating = count > 0 ? sum / count : 0.0;

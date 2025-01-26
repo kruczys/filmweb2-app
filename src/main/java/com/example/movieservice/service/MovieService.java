@@ -7,6 +7,7 @@ import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.Review;
 import com.example.movieservice.repository.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,5 +175,37 @@ public class MovieService {
 
         Movie updatedMovie = movieRepository.save(movie);
         return convertToDTO(updatedMovie);
+    }
+
+    public Page<Movie> findAllByOrderByReleaseDateDesc(Pageable pageable) {
+        return movieRepository.findAllByOrderByReleaseDateDesc(pageable);
+    }
+
+    public Page<Movie> findAllByOrderByReleaseDateAsc(Pageable pageable) {
+        return movieRepository.findAllByOrderByReleaseDateAsc(pageable);
+    }
+
+    public Page<Movie> findAllByOrderByAverageRatingDesc(Pageable pageable) {
+        return movieRepository.findAllByOrderByAverageRatingDesc(pageable);
+    }
+
+    public Page<Movie> findAllByOrderByAverageRatingAsc(Pageable pageable) {
+        return movieRepository.findAllByOrderByAverageRatingAsc(pageable);
+    }
+
+    public Page<Movie> findAllByMinimumRating(Double minRating, Pageable pageable) {
+        return movieRepository.findByAverageRatingGreaterThanEqual(minRating, pageable);
+    }
+
+    public Page<Movie> findAll(PageRequest pageRequest) {
+        return movieRepository.findAll(pageRequest);
+    }
+
+    public Page<Movie> findAllByOrderByAverageRatingDescNullsLast(Pageable pageable) {
+        return movieRepository.findAllByOrderByAverageRatingDescNullsLast(pageable);
+    }
+
+    public Page<Movie> findAllByOrderByAverageRatingAscNullsLast(Pageable pageable) {
+        return movieRepository.findAllByOrderByAverageRatingAscNullsLast(pageable);
     }
 }

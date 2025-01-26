@@ -48,4 +48,32 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
         @Param("castMember") String castMember,
         Pageable pageable
     );
+
+    @Query("SELECT m FROM Movie m ORDER BY m.releaseDate DESC")
+    Page<Movie> findAllByOrderByReleaseDateDesc(Pageable pageable);
+
+    @Query("SELECT m FROM Movie m ORDER BY m.releaseDate ASC")
+    Page<Movie> findAllByOrderByReleaseDateAsc(Pageable pageable);
+
+    @Query(value = "SELECT m.* FROM movies m LEFT JOIN " +
+           "(SELECT movie_id, AVG(rating) as avg_rating FROM reviews WHERE moderated = true GROUP BY movie_id) r " +
+           "ON m.id = r.movie_id " +
+           "ORDER BY COALESCE(r.avg_rating, 0) DESC", 
+           nativeQuery = true)
+    Page<Movie> findAllByOrderByAverageRatingDesc(Pageable pageable);
+
+    @Query(value = "SELECT m.* FROM movies m LEFT JOIN " +
+           "(SELECT movie_id, AVG(rating) as avg_rating FROM reviews WHERE moderated = true GROUP BY movie_id) r " +
+           "ON m.id = r.movie_id " +
+           "ORDER BY COALESCE(r.avg_rating, 0) ASC", 
+           nativeQuery = true)
+    Page<Movie> findAllByOrderByAverageRatingAsc(Pageable pageable);
+
+    Page<Movie> findByAverageRatingGreaterThanEqual(Double minRating, Pageable pageable);
+
+    @Query("SELECT m FROM Movie m ORDER BY CASE WHEN m.averageRating IS NULL THEN 0 ELSE m.averageRating END DESC")
+    Page<Movie> findAllByOrderByAverageRatingDescNullsLast(Pageable pageable);
+
+    @Query("SELECT m FROM Movie m ORDER BY CASE WHEN m.averageRating IS NULL THEN 5 ELSE m.averageRating END ASC")
+    Page<Movie> findAllByOrderByAverageRatingAscNullsLast(Pageable pageable);
 }

@@ -5,11 +5,14 @@ import com.example.movieservice.model.Movie;
 import com.example.movieservice.model.User;
 import com.example.movieservice.service.MovieService;
 import com.example.movieservice.service.UserService;
+import com.example.movieservice.repository.MovieRepository;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,24 +25,38 @@ import java.security.Principal;
 public class MovieController {
     private final MovieService movieService;
     private final UserService userService;
+    private final MovieRepository movieRepository;
 
-    public MovieController(MovieService movieService, UserService userService) {
+    public MovieController(MovieService movieService, UserService userService, MovieRepository movieRepository) {
         this.movieService = movieService;
         this.userService = userService;
+        this.movieRepository = movieRepository;
     }
 
     @GetMapping
-    public String showMoviesList(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
-            @RequestParam(defaultValue = "title") String sortBy,
-            Model model) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<Movie> movies = movieService.getAllMovies(pageRequest);
-
+    public String listMovies(Model model, 
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "12") int size,
+                            @RequestParam(defaultValue = "releaseDate") String sort,
+                            @RequestParam(defaultValue = "desc") String direction) {
+        
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Page<Movie> movies;
+        
+        if (sort.equals("averageRating")) {
+            movies = sortDirection == Sort.Direction.DESC ? 
+                movieService.findAllByOrderByAverageRatingDesc(PageRequest.of(page, size)) :
+                movieService.findAllByOrderByAverageRatingAsc(PageRequest.of(page, size));
+        } else {
+            movies = movieRepository.findAll(
+                PageRequest.of(page, size, Sort.by(sortDirection, sort))
+            );
+        }
+        
         model.addAttribute("movies", movies);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortBy", sort);
+        model.addAttribute("direction", direction);
+        
         return "movies/list";
     }
 
