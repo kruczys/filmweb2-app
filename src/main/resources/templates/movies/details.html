@@ -119,9 +119,16 @@
           <div class="card-body">
             <div class="d-flex justify-content-between mb-2">
               <h5 class="card-title" th:text="${review.user.username}">Użytkownik</h5>
-              <div>
-                <i class="bi bi-star-fill text-warning"></i>
-                <span th:text="${review.rating + '/5'}">5/5</span>
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-star-fill text-warning"></i>
+                  <span th:text="${review.rating + '/5'}">5/5</span>
+                </div>
+                <button th:if="${user != null && user.id == review.user.id}"
+                        class="btn btn-sm btn-danger"
+                        th:onclick="'deleteReview(' + ${review.id} + ')'">
+                  <i class="bi bi-trash"></i>
+                </button>
               </div>
             </div>
             <p class="card-text" th:text="${review.content}">Treść recenzji</p>
@@ -321,6 +328,28 @@ function handleRatingClick(rating) {
             input.nextElementSibling.classList.remove('active');
         }
     });
+}
+
+function deleteReview(reviewId) {
+    if (confirm('Czy na pewno chcesz usunąć tę recenzję?')) {
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania recenzji');
+            }
+        });
+    }
 }
 </script>
 </body>

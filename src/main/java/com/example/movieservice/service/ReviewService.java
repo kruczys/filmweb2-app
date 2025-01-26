@@ -6,6 +6,7 @@ import com.example.movieservice.model.User;
 import com.example.movieservice.repository.ReviewRepository;
 import com.example.movieservice.repository.MovieRepository;
 import com.example.movieservice.repository.UserRepository;
+import com.example.movieservice.repository.CommentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +22,13 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, MovieRepository movieRepository, UserRepository userRepository) {
+    public ReviewService(ReviewRepository reviewRepository, MovieRepository movieRepository, UserRepository userRepository, CommentRepository commentRepository) {
         this.reviewRepository = reviewRepository;
         this.movieRepository = movieRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     public Page<Review> getMovieReviews(Long movieId, Pageable pageable) {
@@ -70,11 +73,18 @@ public class ReviewService {
         return savedReview;
     }
 
+    @Transactional
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new RuntimeException("Nie znaleziono recenzji"));
+        
         Movie movie = review.getMovie();
-        reviewRepository.deleteById(reviewId);
+        movie.getReviews().remove(review);
+        
+        commentRepository.deleteByReviewId(reviewId);
+        
+        reviewRepository.delete(review);
+        
         movie.updateAverageRating();
         movieRepository.save(movie);
     }
@@ -85,5 +95,10 @@ public class ReviewService {
 
     public List<Review> getLatestReviews() {
         return reviewRepository.findLatestReviews(PageRequest.of(0, 10));
+    }
+
+    public Review findById(Long id) {
+        return reviewRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Nie znaleziono recenzji"));
     }
 }

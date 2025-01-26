@@ -91,18 +91,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Wykres aktywności -->
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Aktywność w ostatnim tygodniu</h5>
-                                    <canvas id="activityChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Zarządzanie filmami -->
@@ -341,34 +329,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
-// Wykres aktywności
-const activityData = /*[[${activityData}]]*/ {};
-const ctx = document.getElementById('activityChart').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: activityData.labels,
-        datasets: [{
-            label: 'Nowe recenzje',
-            data: activityData.reviews,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }, {
-            label: 'Nowi użytkownicy',
-            data: activityData.users,
-            borderColor: 'rgb(255, 99, 132)',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
 
 function deleteMovie(id) {
     if (confirm('Czy na pewno chcesz usunąć ten film?')) {

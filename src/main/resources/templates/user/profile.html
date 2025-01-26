@@ -45,9 +45,15 @@
                                         Tytuł filmu
                                     </a>
                                 </h5>
-                                <div>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <span th:text="${review.rating + '/5'}">5/5</span>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <span th:text="${review.rating + '/5'}">5/5</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger" 
+                                            th:onclick="'deleteReview(' + ${review.id} + ')'">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                             <p class="card-text" th:text="${review.content}">Treść recenzji</p>
@@ -160,6 +166,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function deleteReview(reviewId) {
+    if (confirm('Czy na pewno chcesz usunąć tę recenzję?')) {
+        const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        
+        fetch(`/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Wystąpił błąd podczas usuwania recenzji');
+            }
+        });
+    }
+}
 </script>
 </body>
 </html> 

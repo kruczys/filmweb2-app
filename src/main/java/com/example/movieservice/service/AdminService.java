@@ -120,7 +120,18 @@ public class AdminService {
 
     @Transactional
     public void deleteReview(Long reviewId) {
-        reviewRepository.deleteById(reviewId);
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Nie znaleziono recenzji"));
+        
+        Movie movie = review.getMovie();
+        
+        commentRepository.deleteByReviewId(reviewId);
+        
+        reviewRepository.delete(review);
+        
+        movie.getReviews().remove(review);
+        movie.updateAverageRating();
+        movieRepository.save(movie);
     }
 
     @Transactional
