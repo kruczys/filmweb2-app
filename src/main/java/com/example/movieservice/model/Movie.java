@@ -9,13 +9,14 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Data
 @Entity
 @Table(name = "movies")
-@JsonIgnoreProperties({"reviews", "favoritedBy"})
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +43,7 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "cast_member_id")
     )
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<CastMember> cast = new HashSet<>();
 
     @ManyToMany
@@ -50,21 +52,23 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Genre> genres = new HashSet<>();
 
     private String imageUrl;
     private String trailerUrl;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIdentityReference(alwaysAsId = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @JsonManagedReference
     @ManyToMany(mappedBy = "favoriteMovies")
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<User> favoritedBy = new HashSet<>();
 
     @ManyToMany(mappedBy = "watchList")
-    private Set<User> inWatchlistOf = new HashSet<>();
+    @JsonIdentityReference(alwaysAsId = true)
+    private Set<User> inWatchlist = new HashSet<>();
 
     @Column(nullable = true)
     private Double averageRating;

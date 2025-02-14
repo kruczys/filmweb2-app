@@ -26,7 +26,11 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Data
 @Entity
 @Table(name = "users")
@@ -58,22 +62,25 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
-    @JsonBackReference
     @ManyToMany
     @JoinTable(
         name = "user_favorites",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Movie> favoriteMovies = new HashSet<>();
 
     @ManyToMany
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Movie> watchList = new HashSet<>();
 
     @ManyToMany
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Movie> ignoredMovies = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<Review> reviews = new ArrayList<>();
 
     @PrePersist

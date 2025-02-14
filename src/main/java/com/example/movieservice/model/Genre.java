@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Set;
 import java.util.HashSet;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Data
 @Entity
 @Table(name = "genres")
@@ -20,5 +24,6 @@ public class Genre {
     private String description;
 
     @ManyToMany(mappedBy = "genres")
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<Movie> movies = new HashSet<>();
 }

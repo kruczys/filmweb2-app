@@ -79,12 +79,10 @@ public class ReviewService {
             .orElseThrow(() -> new RuntimeException("Nie znaleziono recenzji"));
         
         Movie movie = review.getMovie();
-        movie.getReviews().remove(review);
-        
-        commentRepository.deleteByReviewId(reviewId);
         
         reviewRepository.delete(review);
         
+        movie.getReviews().remove(review);
         movie.updateAverageRating();
         movieRepository.save(movie);
     }
@@ -100,5 +98,9 @@ public class ReviewService {
     public Review findById(Long id) {
         return reviewRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Nie znaleziono recenzji"));
+    }
+
+    public List<Review> getAllReviews() {
+        return reviewRepository.findAll();
     }
 }
